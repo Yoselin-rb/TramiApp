@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago de Factura UTE - Presencial</title>
+    <link rel="stylesheet" href="estilos.css">
+    <link rel="shortcut icon" href="img/LogoICO.ico" type="image/x-icon">
+    
+</head>
+<body>
+
+    <header class="header">
+        <a href="inicio.html" class="btn-volver">‹</a>
+        <h1>Trami<span>App</span></h1>
+        <button id="btn-favorito" class="btn-favorito" onclick="alternarFavorito()">☆</button>    
+    </header>
+
+    <div class="main-container" style="margin-bottom: 70px;">
+        
+        <div class="hero-section">
+            <div class="tramite-header-block">
+                <img src="https://via.placeholder.com/80" alt="UTE">
+                <div class="tramite-header-text">
+                    <h2>Pago de factura de UTE</h2>
+                    <p>El pago de la factura de UTE te permite mantener al día tu servicio de energía eléctrica.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-box">
+                <h3>Modalidad</h3>
+                <p>¿Cómo querés realizar tu trámite?</p>
+                <div class="modalidad-selector">
+                    <a href="ute-presencial.html" class="btn-modalidad active">Presencial 📍</a>
+                    <a href="ute-linea.html" class="btn-modalidad">En línea 💻</a>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>Requisitos (Presencial)</h3>
+                <ul style="padding-left: 20px; font-size: 14px; line-height: 1.6;">
+                    <li>Factura o Número de Cuenta de UTE.</li>
+                    <li>Medio de pago (efectivo o tarjeta de débito).</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h3>¿Dónde se realiza en Guichón?</h3>
+                <p><strong>Abitab Guichón:</strong> 18 de Julio 308 (esq. Orden)</p>
+                <p style="margin-top: 10px;"><strong>RedPagos Guichón:</strong> Luis Alberto de Herrera 375</p>
+                
+                <div style="background:#f0f0f0; padding:10px; border-radius:10px; margin-top:15px; font-size:13px;">
+                    <p>🕒 Lunes a Viernes: 08:15 a 18:30 hs</p>
+                    <p>🕒 Sábado: 08:30 a 12:30 hs</p>
+                </div>
+            </div>
+
+            <div class="info-box" style="text-align: center;">
+                <h3>¿Cómo se hace?</h3>
+                <p style="font-size:13px; margin-bottom:10px;">Mirá el paso a paso en video:</p>
+                <div style="background:#333; width:100%; height:120px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:30px; cursor:pointer;">
+                    ▶️
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <nav class="bottom-nav">
+        <a href="inicio.html" class="nav-item active">🏠</a>
+        <a href="chat.html" class="nav-item">💬</a>
+        <a href="configuracion.html" class="nav-item">⚙️</a>
+    </nav>
+
+    <script src="script.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago de Factura UTE - En Línea</title>
+    <link rel="stylesheet" href="estilos.css">
+    <link rel="shortcut icon" href="img/LogoICO.ico" type="image/x-icon">
+    
+</head>
+<body>
+
+    <header class="header">
+        <a href="inicio.html" class="btn-volver">‹</a>
+        <h1>Trami<span>App</span></h1>
+        <button id="btn-favorito" class="btn-favorito" onclick="alternarFavorito()">☆</button>
+    </header>
+
+    <div class="main-container" style="margin-bottom: 70px;">
+        
+        <div class="hero-section">
+            <div class="tramite-header-block">
+                <img src="https://via.placeholder.com/80" alt="UTE">
+                <div class="tramite-header-text">
+                    <h2>Pago de factura de UTE</h2>
+                    <p>Puedes pagar tu factura de forma fácil y rápida durante las 24 horas del día.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-box">
+                <h3>Modalidad</h3>
+                <p>¿Cómo querés realizar tu trámite?</p>
+                <div class="modalidad-selector">
+                    <a href="ute-presencial.html" class="btn-modalidad">Presencial 📍</a>
+                    <a href="ute-linea.html" class="btn-modalidad active">En línea 💻</a>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>Requisitos (En línea)</h3>
+                <ul style="padding-left: 20px; font-size: 14px; line-height: 1.6;">
+                    <li>N° de Cuenta de UTE (está en la factura).</li>
+                    <li>Correo electrónico.</li>
+                    <li>Medio de pago (tarjeta de débito o crédito).</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h3>¿Dónde se realiza?</h3>
+                <p>A través de la Web/App oficial de UTE o aplicaciones de pago habilitadas.</p>
+                <p style="margin-top:15px; color: var(--verde-oscuro); font-weight:bold;">🕒 Disponible las 24 horas, todos los días.</p>
+            </div>
+
+            <div class="info-box" style="text-align: center;">
+                <h3>¿Cómo se hace?</h3>
+                <p style="font-size:13px; margin-bottom:10px;">Mirá el paso a paso en video:</p>
+                <div style="background:#333; width:100%; height:120px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:30px; cursor:pointer;">
+                    ▶️
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="inicio.html" class="nav-item active">🏠</a>
+        <a href="chat.html" class="nav-item">💬</a>
+        <a href="configuracion.html" class="nav-item">⚙️</a>
+    </nav>
+
+    <script src="script.js"></script>
+    
+</body>
+</html>
