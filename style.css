@@ -1,0 +1,109 @@
+/* Configuración general de la página */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Contenedor principal de los formularios */
+.container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Títulos */
+h2 {
+    margin-top: 0;
+    color: #008f47;
+    text-align: center;
+}
+
+/* Grupos de formularios (espaciado) */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* Etiquetas (labels) */
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666666;
+    font-size: 14px;
+}
+
+/* Inputs de texto, correo, fecha y contraseña */
+input[type="text"],
+input[type="email"],
+input[type="date"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 25px;
+    box-sizing: border-box; /* Evita que el padding deforme el ancho */
+    font-size: 14px;
+}
+
+/* Botones de envío */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #00b159;
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Efecto hover para el botón */
+button:hover {
+    background-color: #008f47;
+}
+
+/* Mensajes de éxito o error */
+.mensaje {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.error {
+    background-color: #fdecea;
+    color: #b71c1c;
+}
+
+.exito {
+    background-color: #e2f7ed;
+    color: #00693e;
+}
+
+/* Enlaces para alternar entre login y registro */
+p {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+p a {
+    color: #00b159;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
