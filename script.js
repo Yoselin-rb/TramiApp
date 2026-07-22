@@ -1,7 +1,7 @@
 /* pantallaa de bienvenida */
 if(window.location.pathname.includes("index.html")){
     setTimeout(() => {
-        window.location.href = "inicio.html";
+        window.location.href = "/TramiApp/files/registro.php";
     }, 3000);
 }
 
