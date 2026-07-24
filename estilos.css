@@ -143,6 +143,12 @@ body {
 .stat-box {
     text-align: center;
     color: var(--texto-oscuro);
+    flex: 1;
+    padding: 5px 0;
+}
+
+.stat-box:not(:last-child) {
+    border-right: 1px solid #eee;
 }
 
 .stat-box .number {
@@ -384,6 +390,7 @@ body {
     flex-direction: column;
 }
 
+
 .profile-section {
     display: flex;
     align-items: center;
@@ -391,11 +398,25 @@ body {
     margin-bottom: 30px;
 }
 
+
+
 .profile-img {
     width: 60px;
     height: 60px;
     background: var(--blanco);
     border-radius: 50%;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.profile-img img {
+    width: 60px; /* Ajusta el tamaño del logo según tu gusto */
+    height: 60px;
+    object-fit: contain;
+    display: block;
 }
 
 .menu-list {

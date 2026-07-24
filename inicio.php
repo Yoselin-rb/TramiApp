@@ -2,8 +2,23 @@
 // Asegúrate de iniciar la sesión al principio de tu archivo para acceder a los datos del usuario
 session_start();
 
+require_once 'conexion.php';
+
 // Obtenemos el nombre desde la sesión. Si no existe, podemos mostrar un texto por defecto como "Invitado".
 $nombreUsuario = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : 'Invitado';
+
+// Finalizados: pendiente. Se activará cuando exista el test dentro del trámite
+// que marca un trámite como completado. Por ahora se muestra en 0.
+$finalizados = 0;
+
+// Favoritos: total real de trámites que el usuario marcó con la estrella ⭐
+$favoritos = 0;
+if (isset($_SESSION['usuario_id'])) {
+    $stmt = $conexion->prepare("SELECT COUNT(*) FROM favoritos WHERE usuario_id = :usuario_id");
+    $stmt->bindParam(':usuario_id', $_SESSION['usuario_id']);
+    $stmt->execute();
+    $favoritos = (int) $stmt->fetchColumn();
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -31,15 +46,11 @@ $nombreUsuario = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'
         
         <div class="stats-container">
             <div class="stat-box">
-                <span class="number">33</span>
+                <span class="number"><?php echo $finalizados; ?></span>
                 <span class="label">Finalizados</span>
             </div>
             <div class="stat-box">
-                <span class="number">2</span>
-                <span class="label">En curso</span>
-            </div>
-            <div class="stat-box">
-                <span class="number">8</span>
+                <span class="number"><?php echo $favoritos; ?></span>
                 <span class="label">Favoritos</span>
             </div>
         </div>
@@ -97,9 +108,9 @@ $nombreUsuario = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'
     </div>
 
     <nav class="bottom-nav">
-        <a href="inicio.html" class="nav-item active">🏠</a>
+        <a href="inicio.php" class="nav-item active">🏠</a>
         <a href="chat.html" class="nav-item">💬</a>
-        <a href="configuracion.html" class="nav-item">⚙️</a>
+        <a href="configuracion.php" class="nav-item">⚙️</a>
     </nav>
 
     <script src="script.js"></script>

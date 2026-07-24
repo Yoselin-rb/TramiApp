@@ -53,6 +53,33 @@ input[type="password"] {
     font-size: 14px;
 }
 
+/* Campo de contraseña con ícono para mostrar/ocultar */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    padding-right: 42px; /* deja espacio para el ícono */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 14px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-password .icon-eye,
+svg.icon-eye {
+    width: 20px !important;
+    height: 20px !important;
+    display: block;
+}
+
 /* Botones de envío */
 button {
     width: 100%;

@@ -65,11 +65,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="form-group">
                 <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" required>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" required>
+                    <span class="toggle-password" onclick="togglePassword('password', this)">
+                        <svg class="icon-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 5 12 5C19 5 23 12 23 12C23 12 19 19 12 19C5 19 1 12 1 12Z" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="#666666" stroke-width="1.6"/>
+                        </svg>
+                    </span>
+                </div>
             </div>
             <button type="submit">Entrar</button>
         </form>
         <p>¿No tienes cuenta? <a href="registro.php">Regístrate aquí</a></p>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>

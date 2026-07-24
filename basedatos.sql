@@ -21,3 +21,20 @@ CREATE TABLE `usuarios` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `correo` (`correo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ---------------------------------------------------------
+-- Tabla favoritos
+-- Guarda qué trámites marcó como favorito cada usuario
+-- (se llena/vacía cuando el usuario toca la estrella ⭐ de un trámite)
+-- `tramite_id` es un identificador corto y fijo para cada trámite,
+-- por ejemplo: 'ute-factura', 'cedula', 'butia', 'gubuy', 'licencia'
+-- ---------------------------------------------------------
+CREATE TABLE `favoritos` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `usuario_id` INT(11) NOT NULL,
+  `tramite_id` VARCHAR(50) NOT NULL,
+  `fecha_agregado` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `usuario_tramite` (`usuario_id`, `tramite_id`),
+  CONSTRAINT `fk_favoritos_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

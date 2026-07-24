@@ -31,13 +31,53 @@ function filtrarTramites() {
 }
 
 
+// Al cargar la página, si hay un botón de favorito, consultamos si el
+// trámite ya está marcado como favorito por el usuario logueado
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('btn-favorito');
+    if (!btn) return;
+
+    const tramiteId = btn.dataset.tramiteId;
+    if (!tramiteId) return;
+
+    fetch(`favorito.php?tramite_id=${encodeURIComponent(tramiteId)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.favorito) {
+                btn.innerText = '★';
+            }
+        })
+        .catch(() => {
+            // Si falla la consulta (ej: no hay sesión), dejamos la estrella vacía
+        });
+});
+
 function alternarFavorito() {
     const btn = document.getElementById('btn-favorito');
- // Si tiene la estrella vacía, la cambia por la llena, y viceversa
     if (!btn) return;
-    if (btn.innerText === '☆') {
-        btn.innerText = '★';
-    } else {
-        btn.innerText = '☆';
-    }
+
+    const tramiteId = btn.dataset.tramiteId;
+    if (!tramiteId) return;
+
+    fetch('favorito.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tramite_id: tramiteId })
+    })
+        .then(res => {
+            if (res.status === 401) {
+                // El usuario no tiene sesión iniciada
+                alert('Iniciá sesión para guardar trámites como favoritos.');
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+            // Actualizamos la estrella según lo que confirmó el servidor
+            btn.innerText = data.favorito ? '★' : '☆';
+        })
+        .catch(() => {
+            alert('No se pudo actualizar el favorito. Intentá nuevamente.');
+        });
 }
