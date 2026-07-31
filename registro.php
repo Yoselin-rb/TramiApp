@@ -1,6 +1,7 @@
 <?php
 // Incluimos el archivo de conexión
 require_once 'conexion.php';
+require_once 'funciones_recordar.php';
 
 // Iniciamos la sesión para poder loguear automáticamente al usuario
 session_start();
@@ -15,6 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $correo           = trim($_POST['correo']);
     $password         = $_POST['password'];
     $password_confirmar = $_POST['password_confirmar'];
+    $recordar         = isset($_POST['recordar']); // checkbox marcado por defecto
 
     // Validación básica en el servidor
     if (empty($nombre) || empty($fecha_nacimiento) || empty($correo) || empty($password) || empty($password_confirmar)) {
@@ -63,6 +65,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // Guardamos los datos de sesión, igual que hace login.php
                     $_SESSION['usuario_id'] = $nuevoId;
                     $_SESSION['usuario_nombre'] = $nombre;
+
+                    // Si dejó tildado "recordar usuario", creamos el token persistente
+                    if ($recordar) {
+                        crearTokenRecordar($conexion, $nuevoId);
+                    }
 
                     // Redirigimos directo a inicio.php, sin pasar por login
                     header("Location: inicio.php");
@@ -136,6 +143,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </span>
                 </div>
             </div>
+
+            <div class="form-group" style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" id="recordar" name="recordar" checked style="width:auto; cursor:pointer;">
+                <label for="recordar" style="margin:0; cursor:pointer;">Recordar mi usuario en este celular</label>
+            </div>
+
             <button type="submit">Registrarse</button>
         </form>
         <p>¿Ya tienes una cuenta? <a href="login.php">Inicia sesión aquí</a></p>

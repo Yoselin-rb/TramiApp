@@ -10,6 +10,7 @@ session_start();
 header('Content-Type: application/json; charset=utf-8');
 
 require_once 'conexion.php';
+require_once 'auto_login.php';
 
 // El usuario debe estar logueado para usar favoritos
 if (!isset($_SESSION['usuario_id'])) {

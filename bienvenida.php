@@ -2,6 +2,9 @@
 // Reanudamos la sesión
 session_start();
 
+require_once 'conexion.php';
+require_once 'auto_login.php';
+
 // Si el usuario no ha iniciado sesión, lo redirigimos al login de inmediato
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");

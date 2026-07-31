@@ -31,6 +31,31 @@ function filtrarTramites() {
 }
 
 
+function togglePassword(inputId, icono) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+ 
+    const svg = icono.querySelector('svg');
+ 
+    if (input.type === "password") {
+        input.type = "text";
+        // Ícono de "ojo tachado" (contraseña visible)
+        svg.innerHTML = `
+            <path d="M1 12C1 12 5 5 12 5C19 5 23 12 23 12C23 12 19 19 12 19C5 19 1 12 1 12Z" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="3" stroke="#666666" stroke-width="1.6"/>
+            <line x1="3" y1="3" x2="21" y2="21" stroke="#666666" stroke-width="1.6" stroke-linecap="round"/>
+        `;
+    } else {
+        input.type = "password";
+        // Ícono de ojo abierto (contraseña oculta)
+        svg.innerHTML = `
+            <path d="M1 12C1 12 5 5 12 5C19 5 23 12 23 12C23 12 19 19 12 19C5 19 1 12 1 12Z" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="3" stroke="#666666" stroke-width="1.6"/>
+        `;
+    }
+}
+
+
 // Al cargar la página, si hay un botón de favorito, consultamos si el
 // trámite ya está marcado como favorito por el usuario logueado
 document.addEventListener('DOMContentLoaded', () => {

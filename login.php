@@ -4,13 +4,26 @@ session_start();
 
 // Incluimos la conexión a la base de datos
 require_once 'conexion.php';
+require_once 'funciones_recordar.php';
+require_once 'auto_login.php';
+
+// Si ya hay sesión activa (por login normal o por "recordar usuario"), vamos directo a inicio
+if (isset($_SESSION['usuario_id'])) {
+    header("Location: inicio.php");
+    exit();
+}
 
 $mensaje = "";
+
+if (isset($_GET['password_restablecida'])) {
+    $mensaje = "<div class='mensaje exito'>Tu contraseña se restableció con éxito. Iniciá sesión con tu nueva contraseña.</div>";
+}
 
 // Verificamos si el formulario se envió por POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $correo = trim($_POST['correo']);
     $password = $_POST['password'];
+    $recordar = isset($_POST['recordar']); // checkbox marcado por defecto
 
     if (!empty($correo) && !empty($password)) {
         try {
@@ -27,6 +40,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Guardamos los datos de sesión del usuario
                 $_SESSION['usuario_id'] = $usuario['id'];
                 $_SESSION['usuario_nombre'] = $usuario['nombre'];
+
+                // Si el usuario dejó tildado "recordar usuario", creamos el token persistente
+                if ($recordar) {
+                    crearTokenRecordar($conexion, $usuario['id']);
+                }
 
                 // Redirigimos a una página de bienvenida o dashboard
                 header("Location: inicio.php");
@@ -75,8 +93,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </span>
                 </div>
             </div>
+
+            <div class="form-group" style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" id="recordar" name="recordar" checked style="width:auto; cursor:pointer;">
+                <label for="recordar" style="margin:0; cursor:pointer;">Recordar mi usuario en este celular</label>
+            </div>
+
             <button type="submit">Entrar</button>
         </form>
+
+        <p><a href="olvide-password.php">¿Olvidaste tu contraseña?</a></p>
         <p>¿No tienes cuenta? <a href="registro.php">Regístrate aquí</a></p>
     </div>
     <script src="script.js"></script>

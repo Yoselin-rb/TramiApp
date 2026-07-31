@@ -2,6 +2,9 @@
 // 1. Iniciar la sesión al principio del archivo
 session_start();
 
+require_once 'conexion.php';
+require_once 'auto_login.php';
+
 // 2. Obtener el nombre del usuario desde la sesión (o asignarle 'Invitado' por defecto)
 $nombreUsuario = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : 'Invitado';
 ?>
