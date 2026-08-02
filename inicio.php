@@ -19,6 +19,7 @@ if (isset($_SESSION['usuario_id'])) {
     $stmt->execute();
     $favoritos = (int) $stmt->fetchColumn();
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -62,23 +63,23 @@ if (isset($_SESSION['usuario_id'])) {
 
         <div class="grid-tramites">
             <a href="#" class="card-tramite">
-                <img src="https://via.placeholder.com/50" alt="Cédula">
+                <img src="./img/Tramites/Cedula.jpg" alt="Cédula" style="width: 100px; height: 100px;">
                 <span>Renovación de Cédula</span>
             </a>
             <a href="ute-presencial.html" class="card-tramite">
-                <img src="https://via.placeholder.com/50" alt="UTE">
+                <img src="./img/Tramites/factura-ute.webp" alt="UTE" style="width: 100px; height: 100px;">
                 <span>Pago de factura de UTE</span>
             </a>
             <a href="#" class="card-tramite">
-                <img src="https://via.placeholder.com/50" alt="Butiá">
+                <img src="./img/Tramites/BUTIA.jpeg" alt="Butiá" style="width: 100px; height: 100px;">
                 <span>Inscripción para beca Butiá</span>
             </a>
             <a href="#" class="card-tramite">
-                <img src="https://via.placeholder.com/50" alt="gub.uy">
+                <img src="./img/Tramites/gub.png" alt="gub.uy" style="width: 70px; height: 70px;">
                 <span>Registro en gub.uy</span>
             </a>
             <a href="#" class="card-tramite">
-                <img src="https://via.placeholder.com/50" alt="Licencia">
+                <img src="./img/Tramites/licenciaConducir.png" alt="Licencia" style="width: 100px; height: 100px;">
                 <span>Licencia de Conducir</span>
             </a>
         </div>

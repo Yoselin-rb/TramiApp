@@ -5,6 +5,10 @@
     --blanco: #ffffff;
     --texto-oscuro: #333333;
     --texto-mutado: #666666;
+
+    /* Escala global de tamaño de letra (1 = tamaño normal).
+       La cambia dinámicamente script.js según lo guardado por el usuario. */
+    --font-scale: 1;
 }
 
 /* pantalla de bienvenida */
@@ -26,7 +30,7 @@
 }
 .splash-title{
     color: white;
-    font-size: 40px;
+    font-size: calc(40px * var(--font-scale));
     font-weight: bold;
 }
 .splash-title span{
@@ -76,13 +80,13 @@ body {
 
 .header .btn-volver {
     text-decoration: none;
-    font-size: 24px;
+    font-size: calc(24px * var(--font-scale));
     color: var(--texto-oscuro);
     font-weight: bold;
 }
 
 .header h1 {
-    font-size: 22px;
+    font-size: calc(22px * var(--font-scale));
     color: var(--texto-oscuro);
     flex-grow: 1;
     text-align: center;
@@ -93,7 +97,7 @@ body {
 }
 
 .header .icon-right {
-    font-size: 24px;
+    font-size: calc(24px * var(--font-scale));
     color: #ffcc00; /* Color estrella favoritos */
 }
 
@@ -124,7 +128,7 @@ body {
     border: 1px solid #ddd;
     margin-bottom: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    font-size: 15px;
+    font-size: calc(15px * var(--font-scale));
     outline: none;
 }
 
@@ -153,13 +157,13 @@ body {
 }
 
 .stat-box .number {
-    font-size: 24px;
+    font-size: calc(24px * var(--font-scale));
     font-weight: bold;
     display: block;
 }
 
 .stat-box .label {
-    font-size: 12px;
+    font-size: calc(12px * var(--font-scale));
     color: var(--texto-mutado);
 }
 
@@ -172,7 +176,7 @@ body {
 }
 
 .section-title {
-    font-size: 18px;
+    font-size: calc(18px * var(--font-scale));
     font-weight: bold;
     color: #1a4225;
 }
@@ -180,7 +184,7 @@ body {
 .btn-ver-mas {
     color: #1a4225;
     text-decoration: none;
-    font-size: 14px;
+    font-size: calc(14px * var(--font-scale));
     font-weight: 600;
 }
 
@@ -221,7 +225,7 @@ body {
 }
 
 .card-tramite span {
-    font-size: 13px;
+    font-size: calc(13px * var(--font-scale));
     font-weight: 500;
 }
 
@@ -250,13 +254,13 @@ body {
 }
 
 .card-tip-content h4 {
-    font-size: 14px;
+    font-size: calc(14px * var(--font-scale));
     margin-bottom: 5px;
     color: var(--texto-oscuro);
 }
 
 .card-tip-content p {
-    font-size: 12px;
+    font-size: calc(12px * var(--font-scale));
     color: var(--texto-mutado);
     line-height: 1.4;
 }
@@ -278,7 +282,7 @@ body {
 .nav-item {
     text-decoration: none;
     color: var(--texto-mutado);
-    font-size: 20px;
+    font-size: calc(20px * var(--font-scale));
 }
 
 .nav-item.active {
@@ -300,12 +304,12 @@ body {
 }
 
 .tramite-header-text h2 {
-    font-size: 22px;
+    font-size: calc(22px * var(--font-scale));
     margin-bottom: 5px;
 }
 
 .tramite-header-text p {
-    font-size: 14px;
+    font-size: calc(14px * var(--font-scale));
     opacity: 0.9;
 }
 
@@ -328,7 +332,7 @@ body {
 }
 
 .info-box h3 {
-    font-size: 16px;
+    font-size: calc(16px * var(--font-scale));
     margin-bottom: 15px;
     color: var(--texto-oscuro);
     border-bottom: 1px solid #eee;
@@ -338,7 +342,7 @@ body {
 .btn-favorito {
     background: none;
     border: none;
-    font-size: 28px;
+    font-size: calc(28px * var(--font-scale));
     cursor: pointer;
     color: #ffcc00; /* Color amarillo para cuando se llene */
     outline: none;
@@ -359,7 +363,7 @@ body {
     text-align: center;
     text-decoration: none;
     color: var(--texto-oscuro);
-    font-size: 14px;
+    font-size: calc(14px * var(--font-scale));
 }
 
 .btn-modalidad.active {
@@ -437,7 +441,7 @@ body {
     padding: 12px 10px;
     color: var(--texto-oscuro);
     text-decoration: none;
-    font-size: 15px;
+    font-size: calc(15px * var(--font-scale));
     border-bottom: 1px solid #f0f0f0;
 }
 
@@ -477,7 +481,7 @@ body {
 .labels {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: calc(12px * var(--font-scale));
     color: #666;
 }
 .btn-guardar {
@@ -488,9 +492,12 @@ body {
     text-align: center;
     padding: 12px;
     border-radius: 25px;
+    border: none;
     text-decoration: none;
     margin-top: 20px;
     font-weight: bold;
+    font-size: calc(15px * var(--font-scale));
+    cursor: pointer;
 }
 
 /* tips y consejos */
@@ -501,7 +508,7 @@ body {
     border: none;
     margin-bottom: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    font-size: 15px;
+    font-size: calc(15px * var(--font-scale));
 }
 
 /* chat */
@@ -526,7 +533,7 @@ body {
     max-width: 80%;
     padding: 12px 15px;
     border-radius: 15px;
-    font-size: 14px;
+    font-size: calc(14px * var(--font-scale));
     line-height: 1.4;
 }
 .msg.user {

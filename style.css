@@ -1,3 +1,7 @@
+:root {
+    --font-scale: 1;
+}
+
 /* Configuración general de la página */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -37,7 +41,7 @@ label {
     display: block;
     margin-bottom: 5px;
     color: #666666;
-    font-size: 14px;
+    font-size: calc(14px * var(--font-scale));
 }
 
 /* Inputs de texto, correo, fecha y contraseña */
@@ -50,7 +54,7 @@ input[type="password"] {
     border: 1px solid #cccccc;
     border-radius: 25px;
     box-sizing: border-box; /* Evita que el padding deforme el ancho */
-    font-size: 14px;
+    font-size: calc(14px * var(--font-scale));
 }
 
 /* Campo de contraseña con ícono para mostrar/ocultar */
@@ -88,7 +92,7 @@ button {
     color: #ffffff;
     border: none;
     border-radius: 25px;
-    font-size: 16px;
+    font-size: calc(16px * var(--font-scale));
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -105,7 +109,7 @@ button:hover {
     margin-bottom: 15px;
     border-radius: 8px;
     text-align: center;
-    font-size: 14px;
+    font-size: calc(14px * var(--font-scale));
 }
 
 .error {
@@ -122,7 +126,7 @@ button:hover {
 p {
     text-align: center;
     margin-top: 15px;
-    font-size: 14px;
+    font-size: calc(14px * var(--font-scale));
 }
 
 p a {

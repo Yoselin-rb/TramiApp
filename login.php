@@ -41,6 +41,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['usuario_id'] = $usuario['id'];
                 $_SESSION['usuario_nombre'] = $usuario['nombre'];
 
+                // Restauramos el tamaño de letra guardado en su cuenta (o 2 = Mediano por defecto)
+                $tamanoLetra = isset($usuario['tamano_letra']) && $usuario['tamano_letra'] !== null
+                    ? (int) $usuario['tamano_letra']
+                    : 2;
+                $_SESSION['tamano_letra'] = $tamanoLetra;
+                setcookie('tamano_letra', (string) $tamanoLetra, time() + (365 * 24 * 60 * 60), '/');
+
                 // Si el usuario dejó tildado "recordar usuario", creamos el token persistente
                 if ($recordar) {
                     crearTokenRecordar($conexion, $usuario['id']);
@@ -96,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="form-group" style="display:flex; align-items:center; gap:8px;">
                 <input type="checkbox" id="recordar" name="recordar" checked style="width:auto; cursor:pointer;">
-                <label for="recordar" style="margin:0; cursor:pointer;">Recordar mi usuario en este celular</label>
+                <label for="recordar" style="margin:0; cursor:pointer;">Recordar mi usuario en este dispositivo</label>
             </div>
 
             <button type="submit">Entrar</button>

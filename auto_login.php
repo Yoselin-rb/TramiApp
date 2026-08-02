@@ -15,7 +15,7 @@ if (!isset($_SESSION['usuario_id']) && isset($_COOKIE['recordar_token'])) {
         list($tokenId, $tokenOriginal) = $partes;
 
         $stmt = $conexion->prepare(
-            "SELECT tr.usuario_id, tr.token_hash, tr.fecha_expiracion, u.nombre
+            "SELECT tr.usuario_id, tr.token_hash, tr.fecha_expiracion, u.nombre, u.tamano_letra
              FROM tokens_recordar tr
              INNER JOIN usuarios u ON u.id = tr.usuario_id
              WHERE tr.id = :id"
@@ -28,6 +28,11 @@ if (!isset($_SESSION['usuario_id']) && isset($_COOKIE['recordar_token'])) {
             // Token válido: restauramos la sesión sin pedir contraseña
             $_SESSION['usuario_id'] = $registro['usuario_id'];
             $_SESSION['usuario_nombre'] = $registro['nombre'];
+
+            // Restauramos también el tamaño de letra guardado en la cuenta
+            $tamanoLetra = $registro['tamano_letra'] !== null ? (int) $registro['tamano_letra'] : 2;
+            $_SESSION['tamano_letra'] = $tamanoLetra;
+            setcookie('tamano_letra', (string) $tamanoLetra, time() + (365 * 24 * 60 * 60), '/');
         } else {
             // Token inválido, vencido o inexistente: limpiamos la cookie por seguridad
             setcookie('recordar_token', '', time() - 3600, '/');

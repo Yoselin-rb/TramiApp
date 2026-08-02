@@ -30,7 +30,9 @@ function enviarCodigoRecuperacion($correoDestino, $nombreDestino, $codigo) {
         $mail->Port       = SMTP_PORT;
         $mail->CharSet    = 'UTF-8';
 
-        $mail->setFrom(SMTP_USER, 'TramiApp');
+        // Importante: el remitente (From) tiene que ser una dirección con
+        // formato de correo válido, NO el usuario de autenticación SMTP.
+        $mail->setFrom(FROM_EMAIL, 'TramiApp');
         $mail->addAddress($correoDestino, $nombreDestino);
 
         $mail->isHTML(true);

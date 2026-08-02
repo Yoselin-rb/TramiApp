@@ -1,3 +1,89 @@
+/* ---------- Tamaño de letra (aplica en toda la app) ---------- */
+
+function getCookie(nombre) {
+    const match = document.cookie.match(new RegExp('(?:^|; )' + nombre + '=([^;]*)'));
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
+function setCookie(nombre, valor, dias) {
+    const fecha = new Date();
+    fecha.setTime(fecha.getTime() + dias * 24 * 60 * 60 * 1000);
+    document.cookie = `${nombre}=${encodeURIComponent(valor)}; expires=${fecha.toUTCString()}; path=/`;
+}
+
+// Convierte el nivel del slider (1, 2 o 3) en el multiplicador real de tamaño
+function escalaDesdeNivel(nivel) {
+    switch (parseInt(nivel, 10)) {
+        case 1: return 0.85;  // Pequeño
+        case 3: return 1.15;  // Grande
+        default: return 1;    // Mediano
+    }
+}
+
+// Aplica la escala a TODA la página actual (afecta cualquier CSS que use var(--font-scale))
+function aplicarTamanoLetra(nivel) {
+    document.documentElement.style.setProperty('--font-scale', escalaDesdeNivel(nivel));
+}
+
+// Actualiza únicamente el recuadro de "vista previa" dentro de la pantalla de ajustes
+function actualizarVistaPrevia(nivel) {
+    const preview = document.getElementById('texto-vista-previa');
+    if (!preview) return;
+    preview.style.fontSize = `${16 * escalaDesdeNivel(nivel)}px`;
+}
+
+// Envía el nuevo tamaño al servidor: si hay sesión iniciada, se guarda en la cuenta
+// del usuario (queda para siempre, en cualquier dispositivo); si no, solo queda
+// guardado en este navegador mediante la cookie.
+function guardarTamanoLetra() {
+    const slider = document.getElementById('slider-tamano');
+    if (!slider) return;
+    const nivel = slider.value;
+    const boton = document.getElementById('btn-guardar-letra');
+
+    if (boton) {
+        boton.textContent = 'Guardando...';
+    }
+
+    fetch('guardar_tamano_letra.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tamano: nivel })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.ok) {
+                setCookie('tamano_letra', nivel, 365);
+                window.location.href = 'configuracion.php';
+            } else {
+                alert('No se pudo guardar el tamaño de letra. Intentá nuevamente.');
+                if (boton) boton.textContent = 'Guardar cambios';
+            }
+        })
+        .catch(() => {
+            alert('No se pudo guardar el tamaño de letra. Intentá nuevamente.');
+            if (boton) boton.textContent = 'Guardar cambios';
+        });
+}
+
+// Al cargar cualquier página del sitio, aplicamos el tamaño de letra guardado
+document.addEventListener('DOMContentLoaded', () => {
+    const nivelGuardado = getCookie('tamano_letra') || '2';
+    aplicarTamanoLetra(nivelGuardado);
+
+    // Si estamos en la pantalla de ajuste de tamaño de letra, conectamos el slider
+    const slider = document.getElementById('slider-tamano');
+    if (slider) {
+        slider.value = nivelGuardado;
+        actualizarVistaPrevia(nivelGuardado);
+
+        slider.addEventListener('input', () => {
+            aplicarTamanoLetra(slider.value);      // vista previa en vivo de toda la app
+            actualizarVistaPrevia(slider.value);   // vista previa dentro del recuadro
+        });
+    }
+});
+
 /* pantallaa de bienvenida */
 if(window.location.pathname.includes("index.html")){
     setTimeout(() => {
