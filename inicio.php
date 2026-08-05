@@ -91,14 +91,14 @@ if (isset($_SESSION['usuario_id'])) {
 
         <div class="grid-tips">
             <div class="card-tip">
-                <img src="https://via.placeholder.com/70" alt="Beca">
+                <img src="img/Tips/fondo_solidaridad.png" alt="Beca" style="width: 70px; height: 100px;">
                 <div class="card-tip-content">
                     <h4>Apoyá tus estudios con una beca</h4>
                     <p>El Fondo de Solidaridad brinda ayuda económica para tu carrera.</p>
                 </div>
             </div>
             <div class="card-tip">
-                <img src="https://via.placeholder.com/70" alt="Estafas">
+                <img src="img/Tips/estafasTelefonicas.png" alt="Estafas" style="width: 70px; height: 100px;">
                 <div class="card-tip-content">
                     <h4>Cuidado con las estafas telefónicas</h4>
                     <p>Ninguna entidad pública te va a pedir contraseñas por llamada.</p>
