@@ -192,3 +192,200 @@ function alternarFavorito() {
             alert('No se pudo actualizar el favorito. Intentá nuevamente.');
         });
 }
+
+
+/* ---------- Test de trámite ("Evaluación rápida") ---------- */
+
+// Banco de preguntas por trámite. Para agregar el test de un nuevo trámite,
+// alcanza con sumar una entrada nueva acá con su tramite_id como clave.
+const MAPA_TESTS = {
+    'ute-factura': [
+        {
+            texto: '¿Qué documento principal necesitás para el trámite de factura de UTE?',
+            opciones: [
+                'N° de Cuenta de UTE (está en la factura)',
+                'Cédula de identidad',
+                'Partida de nacimiento',
+                'Comprobante de domicilio'
+            ],
+            correcta: 0
+        },
+        {
+            texto: '¿Dónde podés realizar el trámite de UTE?',
+            opciones: [
+                'Únicamente en las oficinas de UTE',
+                'Solo se puede hacer por teléfono',
+                'A través de la web/App de UTE o aplicaciones de pago habilitadas',
+                'No se puede pagar en Guichón'
+            ],
+            correcta: 2
+        },
+        {
+            texto: '¿Qué medio de pago podés utilizar para realizar el pago en línea?',
+            opciones: [
+                'Solo efectivo',
+                'Tarjeta de débito o crédito',
+                'Cheque',
+                'Giro postal'
+            ],
+            correcta: 1
+        },
+        {
+            texto: 'Pagaste la factura. ¿Qué es lo más recomendable hacer?',
+            opciones: [
+                'Borrar el comprobante enseguida',
+                'Llamar a UTE para avisar',
+                'Guardar el comprobante de pago',
+                'No hace falta guardar nada'
+            ],
+            correcta: 2
+        }
+    ]
+};
+
+// Estado del test que se está rindiendo actualmente
+let testEstado = {
+    tramiteId: '',
+    preguntas: [],
+    actual: 0,
+    respuestas: []
+};
+
+// Se llama desde el botón "Comenzar test" (onclick="comenzarTest(this)")
+function comenzarTest(boton) {
+    const tramiteId = boton.dataset.tramiteId;
+    const preguntas = MAPA_TESTS[tramiteId];
+    if (!preguntas) return;
+
+    testEstado = {
+        tramiteId: tramiteId,
+        preguntas: preguntas,
+        actual: 0,
+        respuestas: new Array(preguntas.length).fill(null)
+    };
+
+    document.getElementById('test-intro').classList.add('oculto');
+    document.getElementById('test-quiz').classList.remove('oculto');
+    document.getElementById('test-resultado').classList.add('oculto');
+
+    renderPreguntaTest();
+}
+
+function renderPreguntaTest() {
+    const { preguntas, actual, respuestas } = testEstado;
+    const pregunta = preguntas[actual];
+
+    document.getElementById('test-contador').textContent = `Pregunta ${actual + 1} de ${preguntas.length}`;
+
+    // Barra de progreso: un segmento por pregunta, se completan hasta la actual
+    const barra = document.getElementById('test-barra-progreso');
+    barra.innerHTML = '';
+    preguntas.forEach((_, i) => {
+        const segmento = document.createElement('div');
+        segmento.className = 'test-progress-segment' + (i <= actual ? ' completado' : '');
+        barra.appendChild(segmento);
+    });
+
+    document.getElementById('test-texto-pregunta').textContent = pregunta.texto;
+
+    // Opciones de respuesta
+    const contenedorOpciones = document.getElementById('test-opciones');
+    contenedorOpciones.innerHTML = '';
+    pregunta.opciones.forEach((opcion, i) => {
+        const div = document.createElement('div');
+        div.className = 'test-opcion' + (respuestas[actual] === i ? ' seleccionada' : '');
+        div.innerHTML = `<span class="test-opcion-circulo">${respuestas[actual] === i ? '✓' : ''}</span><span>${opcion}</span>`;
+        div.addEventListener('click', () => seleccionarOpcionTest(i));
+        contenedorOpciones.appendChild(div);
+    });
+
+    document.getElementById('btn-test-anterior').disabled = actual === 0;
+}
+
+function seleccionarOpcionTest(indice) {
+    testEstado.respuestas[testEstado.actual] = indice;
+    renderPreguntaTest();
+}
+
+function irPreguntaAnteriorTest() {
+    if (testEstado.actual === 0) return;
+    testEstado.actual -= 1;
+    renderPreguntaTest();
+}
+
+function irSiguientePreguntaTest() {
+    const { actual, preguntas, respuestas } = testEstado;
+
+    if (respuestas[actual] === null) {
+        alert('Seleccioná una opción para continuar.');
+        return;
+    }
+
+    if (actual < preguntas.length - 1) {
+        testEstado.actual += 1;
+        renderPreguntaTest();
+    } else {
+        finalizarTest();
+    }
+}
+
+function finalizarTest() {
+    const { preguntas, respuestas, tramiteId } = testEstado;
+
+    let correctas = 0;
+    preguntas.forEach((pregunta, i) => {
+        if (respuestas[i] === pregunta.correcta) correctas += 1;
+    });
+
+    const total = preguntas.length;
+    const aprobo = correctas >= Math.ceil(total * 0.75);
+
+    document.getElementById('test-quiz').classList.add('oculto');
+    document.getElementById('test-resultado').classList.remove('oculto');
+
+    document.getElementById('test-resultado-icono').textContent = aprobo ? '👍' : '🙁';
+    document.getElementById('test-resultado-titulo').textContent = aprobo ? '¡Excelente!' : 'Casi lo lográs';
+
+    const subtitulo = document.getElementById('test-resultado-subtitulo');
+    subtitulo.textContent = aprobo ? 'Aprobaste el test' : 'No aprobaste el test';
+    subtitulo.className = aprobo ? 'test-subtitulo-aprobado' : 'test-subtitulo-no-aprobado';
+
+    document.getElementById('test-resultado-correctas').textContent = `Respuestas correctas: ${correctas} de ${total}`;
+
+    const filaEstado = document.getElementById('test-resultado-fila-estado');
+    filaEstado.style.display = aprobo ? 'flex' : 'none';
+
+    const btnReintentar = document.getElementById('btn-test-reintentar');
+    if (btnReintentar) {
+        btnReintentar.style.display = aprobo ? 'none' : 'block';
+    }
+
+    const avisoSesion = document.getElementById('test-resultado-aviso-sesion');
+    if (avisoSesion) {
+        avisoSesion.style.display = 'none';
+    }
+
+    // Si aprobó, guardamos el avance en la cuenta del usuario (igual que favoritos)
+    if (aprobo) {
+        fetch('finalizar_tramite.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tramite_id: tramiteId, correctas: correctas, total: total })
+        })
+            .then(res => {
+                if (res.status === 401) {
+                    // Sin sesión iniciada: mostramos el resultado igual, pero avisamos que no quedó guardado
+                    if (avisoSesion) avisoSesion.style.display = 'block';
+                    return null;
+                }
+                return res.json();
+            })
+            .catch(() => {
+                // Si falla el guardado no interrumpimos la experiencia del usuario
+            });
+    }
+}
+
+function reintentarTest() {
+    comenzarTest({ dataset: { tramiteId: testEstado.tramiteId } });
+}

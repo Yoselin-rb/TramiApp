@@ -7,9 +7,14 @@ require_once 'conexion.php';
 // Obtenemos el nombre desde la sesión. Si no existe, podemos mostrar un texto por defecto como "Invitado".
 $nombreUsuario = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : 'Invitado';
 
-// Finalizados: pendiente. Se activará cuando exista el test dentro del trámite
-// que marca un trámite como completado. Por ahora se muestra en 0.
+// Finalizados: total real de trámites que el usuario completó aprobando el test
 $finalizados = 0;
+if (isset($_SESSION['usuario_id'])) {
+    $stmt = $conexion->prepare("SELECT COUNT(*) FROM finalizados WHERE usuario_id = :usuario_id");
+    $stmt->bindParam(':usuario_id', $_SESSION['usuario_id']);
+    $stmt->execute();
+    $finalizados = (int) $stmt->fetchColumn();
+}
 
 // Favoritos: total real de trámites que el usuario marcó con la estrella ⭐
 $favoritos = 0;
