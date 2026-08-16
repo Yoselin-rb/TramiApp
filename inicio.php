@@ -5,12 +5,14 @@ session_start();
 require_once 'conexion.php';
 
 // Obtenemos el nombre desde la sesión. Si no existe, podemos mostrar un texto por defecto como "Invitado".
+$esInvitado = !isset($_SESSION['usuario_id']);
 $nombreUsuario = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : 'Invitado';
 
-// Finalizados: total real de trámites que el usuario completó aprobando el test
+// Finalizados: cantidad de trámites DISTINTOS que el usuario completó
+// aprobando el test (si repitió un test varias veces, cuenta una sola vez)
 $finalizados = 0;
 if (isset($_SESSION['usuario_id'])) {
-    $stmt = $conexion->prepare("SELECT COUNT(*) FROM finalizados WHERE usuario_id = :usuario_id");
+    $stmt = $conexion->prepare("SELECT COUNT(DISTINCT tramite_id) FROM finalizados WHERE usuario_id = :usuario_id");
     $stmt->bindParam(':usuario_id', $_SESSION['usuario_id']);
     $stmt->execute();
     $finalizados = (int) $stmt->fetchColumn();
@@ -44,46 +46,50 @@ if (isset($_SESSION['usuario_id'])) {
         </div>
         <h1>Trami<span>App</span></h1>
         <div class="user-welcome">
-            Bienvenido, <strong><?php echo htmlspecialchars($nombreUsuario); ?></strong>
+            <?php if ($esInvitado): ?>
+                <a href="login.php" class="btn-iniciar-sesion">Iniciar sesión</a>
+            <?php else: ?>
+                Bienvenido, <strong><?php echo htmlspecialchars($nombreUsuario); ?></strong>
+            <?php endif; ?>
         </div>
     </header>
 
     <div class="main-container" style="margin-bottom: 70px;">
         
         <div class="stats-container">
-            <div class="stat-box">
+            <a href="mi-actividad.php" class="stat-box">
                 <span class="number"><?php echo $finalizados; ?></span>
                 <span class="label">Finalizados</span>
-            </div>
-            <div class="stat-box">
+            </a>
+            <a href="mi-actividad.php?tab=favoritos" class="stat-box">
                 <span class="number"><?php echo $favoritos; ?></span>
                 <span class="label">Favoritos</span>
-            </div>
+            </a>
         </div>
 
         <div class="section-title-container">
             <h3 class="section-title">Trámites frecuentes</h3>
-            <a href="tramites-guichon.html" class="btn-ver-mas">Ver más</a>
+            <a href="tramites-guichon.php" class="btn-ver-mas">Ver más</a>
         </div>
 
         <div class="grid-tramites">
-            <a href="#" class="card-tramite">
+            <a href="<?php echo $esInvitado ? 'registro.php' : '#'; ?>" class="card-tramite">
                 <img src="./img/Tramites/Cedula.jpg" alt="Cédula" style="width: 100px; height: 100px;">
                 <span>Renovación de Cédula</span>
             </a>
-            <a href="ute-presencial.html" class="card-tramite">
+            <a href="<?php echo $esInvitado ? 'registro.php' : 'ute-presencial.html'; ?>" class="card-tramite">
                 <img src="./img/Tramites/factura-ute.webp" alt="UTE" style="width: 100px; height: 100px;">
                 <span>Pago de factura de UTE</span>
             </a>
-            <a href="#" class="card-tramite">
+            <a href="<?php echo $esInvitado ? 'registro.php' : '#'; ?>" class="card-tramite">                
                 <img src="./img/Tramites/BUTIA.jpeg" alt="Butiá" style="width: 100px; height: 100px;">
                 <span>Inscripción para beca Butiá</span>
             </a>
-            <a href="#" class="card-tramite">
+            <a href="<?php echo $esInvitado ? 'registro.php' : '#'; ?>" class="card-tramite">
                 <img src="./img/Tramites/gub.png" alt="gub.uy" style="width: 70px; height: 70px;">
                 <span>Registro en gub.uy</span>
             </a>
-            <a href="#" class="card-tramite">
+            <a href="<?php echo $esInvitado ? 'registro.php' : '#'; ?>" class="card-tramite">
                 <img src="./img/Tramites/licenciaConducir.png" alt="Licencia" style="width: 100px; height: 100px;">
                 <span>Licencia de Conducir</span>
             </a>
@@ -115,7 +121,7 @@ if (isset($_SESSION['usuario_id'])) {
 
     <nav class="bottom-nav">
         <a href="inicio.php" class="nav-item active">🏠</a>
-        <a href="chat.html" class="nav-item">💬</a>
+        <a href="asistente.html" class="nav-item">💬</a>
         <a href="configuracion.php" class="nav-item">⚙️</a>
     </nav>
 

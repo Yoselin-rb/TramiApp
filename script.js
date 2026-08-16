@@ -389,3 +389,90 @@ function finalizarTest() {
 function reintentarTest() {
     comenzarTest({ dataset: { tramiteId: testEstado.tramiteId } });
 }
+
+
+/* ---------- Página de detalle de trámite (Presencial / En línea) ---------- */
+
+// Cambia qué contenido se muestra (Presencial o En línea) dentro de
+// tramite-detalle.php, y marca el botón correspondiente como activo.
+function mostrarModalidadTramite(modalidad) {
+    document.querySelectorAll('.btn-modalidad').forEach(b => b.classList.remove('active'));
+    const boton = document.getElementById('btn-modalidad-' + modalidad);
+    if (boton) boton.classList.add('active');
+
+    document.querySelectorAll('.contenido-presencial, .contenido-online').forEach(el => {
+        el.classList.add('oculto');
+    });
+    document.querySelectorAll('.contenido-' + modalidad).forEach(el => {
+        el.classList.remove('oculto');
+    });
+}
+
+// Al cargar tramite-detalle.php, mostramos la modalidad indicada en el
+// atributo data-modalidad-inicial del selector (la primera disponible)
+document.addEventListener('DOMContentLoaded', () => {
+    const selector = document.querySelector('.modalidad-selector');
+    if (!selector) return;
+
+    const inicial = selector.dataset.modalidadInicial || 'presencial';
+    mostrarModalidadTramite(inicial);
+});
+
+/* ---------- Mi actividad (Finalizados / Favoritos) ---------- */
+
+// Cambia entre la pestaña "Finalizados" y "Favoritos" en mi-actividad.php
+function mostrarTabActividad(tab) {
+    document.querySelectorAll('.tab-actividad').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel-actividad').forEach(p => p.classList.remove('active'));
+
+    const tabBtn = document.getElementById('tab-' + tab);
+    const panel = document.getElementById('panel-' + tab);
+    if (!tabBtn || !panel) return;
+
+    tabBtn.classList.add('active');
+    panel.classList.add('active');
+
+    // Guardamos la pestaña elegida en la URL (sin recargar la página) para
+    // que un link como "mi-actividad.php?tab=favoritos" abra directo ahí
+    if (window.history && window.history.replaceState) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', tab);
+        window.history.replaceState(null, '', url);
+    }
+}
+
+// Al entrar a mi-actividad.php, abrimos la pestaña indicada en la URL
+// (?tab=favoritos), o "Finalizados" por defecto
+document.addEventListener('DOMContentLoaded', () => {
+    const tabsActividad = document.querySelector('.tabs-actividad');
+    if (!tabsActividad) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const tabInicial = params.get('tab') === 'favoritos' ? 'favoritos' : 'finalizados';
+    mostrarTabActividad(tabInicial);
+});
+
+// Quita un trámite de favoritos directamente desde la lista de "Mi actividad"
+function quitarFavoritoActividad(boton, tramiteId) {
+    fetch('favorito.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tramite_id: tramiteId })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (!data || data.favorito !== false) return;
+
+            const card = boton.closest('.card-actividad');
+            if (card) card.remove();
+
+            // Si ya no queda ningún favorito, mostramos el mensaje de vacío
+            const panel = document.getElementById('panel-favoritos');
+            if (panel && !panel.querySelector('.card-actividad')) {
+                panel.innerHTML = '<div class="estado-vacio-actividad"><span>☆</span>Todavía no marcaste trámites como favoritos.</div>';
+            }
+        })
+        .catch(() => {
+            alert('No se pudo quitar el favorito. Intentá nuevamente.');
+        });
+}

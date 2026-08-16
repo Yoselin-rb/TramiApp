@@ -35,6 +35,10 @@ $nombreUsuario = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'
             </div>
 
             <div class="menu-list">
+                <a href="mi-actividad.php" class="menu-item">
+                    <span>📋 &nbsp; Mi actividad</span>
+                    <span>›</span>
+                </a>
                 <a href="tamano-letra.html" class="menu-item">
                     <span>Aa &nbsp; Tamaño de letra</span>
                     <span>›</span>
@@ -55,7 +59,7 @@ $nombreUsuario = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'
 
     <nav class="bottom-nav">
         <a href="inicio.php" class="nav-item">🏠</a>
-        <a href="chat.html" class="nav-item">💬</a>
+        <a href="asistente.html" class="nav-item">💬</a>
         <a href="configuracion.php" class="nav-item active">⚙️</a>
     </nav>
 

@@ -41,6 +41,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['usuario_id'] = $usuario['id'];
                 $_SESSION['usuario_nombre'] = $usuario['nombre'];
 
+                // Guardamos también el rol (invitado/usuario/editor/soporte) para
+                // poder mostrar u ocultar secciones según el perfil, como el panel
+                // de administración de trámites (ver verificar_editor.php)
+                $_SESSION['rol'] = $usuario['rol'];
+
                 // Restauramos el tamaño de letra guardado en su cuenta (o 2 = Mediano por defecto)
                 $tamanoLetra = isset($usuario['tamano_letra']) && $usuario['tamano_letra'] !== null
                     ? (int) $usuario['tamano_letra']

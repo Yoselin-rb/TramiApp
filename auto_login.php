@@ -15,7 +15,7 @@ if (!isset($_SESSION['usuario_id']) && isset($_COOKIE['recordar_token'])) {
         list($tokenId, $tokenOriginal) = $partes;
 
         $stmt = $conexion->prepare(
-            "SELECT tr.usuario_id, tr.token_hash, tr.fecha_expiracion, u.nombre, u.tamano_letra
+            "SELECT tr.usuario_id, tr.token_hash, tr.fecha_expiracion, u.nombre, u.tamano_letra, u.rol
              FROM tokens_recordar tr
              INNER JOIN usuarios u ON u.id = tr.usuario_id
              WHERE tr.id = :id"
@@ -28,6 +28,11 @@ if (!isset($_SESSION['usuario_id']) && isset($_COOKIE['recordar_token'])) {
             // Token válido: restauramos la sesión sin pedir contraseña
             $_SESSION['usuario_id'] = $registro['usuario_id'];
             $_SESSION['usuario_nombre'] = $registro['nombre'];
+
+            // Restauramos también el rol (necesario para que verificar_editor.php
+            // funcione aunque el usuario haya entrado por "recordar usuario" y no
+            // por login.php)
+            $_SESSION['rol'] = $registro['rol'];
 
             // Restauramos también el tamaño de letra guardado en la cuenta
             $tamanoLetra = $registro['tamano_letra'] !== null ? (int) $registro['tamano_letra'] : 2;

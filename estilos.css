@@ -108,6 +108,22 @@ body {
     border-radius: 25px 25px 0 0;
 }
 
+/* botón de iniciar sesión si entra como invitado */
+.btn-iniciar-sesion {
+    background-color: #000;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.btn-iniciar-sesion:hover {
+    background-color: #222;
+}
+
 /* seccion de tramites */
 .hero-section {
     background-color: var(--verde-principal);
@@ -144,6 +160,7 @@ body {
 .stat-box {
     text-align: center;
     color: var(--texto-oscuro);
+    text-decoration: none;
     flex: 1;
     padding: 5px 0;
 }
@@ -640,7 +657,8 @@ body {
 }
 
 .btn-comenzar-test:hover {
-    background-color: var(--verde-oscuro);
+    background-color: var(--fondo-gris);
+    color: var(--texto-oscuro);
 }
 
 /* Pantalla de preguntas */
@@ -669,7 +687,7 @@ body {
 }
 
 .test-progress-segment.completado {
-    background-color: var(--verde-principal);
+    background-color: var(--texto-oscuro);
     border-color: var(--verde-oscuro);
 }
 
@@ -764,7 +782,7 @@ body {
     gap: 6px;
     background-color: var(--fondo-gris);
     color: var(--texto-oscuro);
-    border: 2px solid var(--verde-principal);
+    border: 2px solid #cccccc;
     border-radius: 25px;
     padding: 12px;
     font-size: calc(15px * var(--font-scale));
@@ -775,8 +793,8 @@ body {
 }
 
 .btn-test-siguiente:hover {
-    background-color: var(--verde-oscuro);
-    border-color: var(--verde-oscuro);
+    background-color: #f0f0f0;
+    border-color: #aaaaaa;
     box-shadow: 0 4px 10px rgba(0, 143, 71, 0.4);
 }
 
@@ -837,7 +855,7 @@ body {
 
 .test-resultado-aviso {
     font-size: calc(13px * var(--font-scale));
-    color: var(--texto-mutado);
+    color: var(--texto-negro);
     margin: -10px auto 20px auto;
     max-width: 320px;
 }
@@ -865,7 +883,7 @@ body {
     margin: 0 auto 15px auto;
     background: none;
     border: 1px solid var(--verde-principal);
-    color: var(--verde-oscuro);
+    color: var(--texto-oscuro);
     padding: 10px 25px;
     border-radius: 25px;
     font-weight: bold;
@@ -877,4 +895,112 @@ body {
     color: var(--texto-oscuro);
     font-weight: bold;
     text-decoration: underline;
+}
+
+/* ---------- Mi actividad (Finalizados / Favoritos) ---------- */
+
+.tabs-actividad {
+    display: flex;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.tab-actividad {
+    flex: 1;
+    text-align: center;
+    padding: 14px 10px;
+    background-color: var(--fondo-gris);
+    color: var(--texto-mutado);
+    font-weight: 600;
+    font-size: calc(14px * var(--font-scale));
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: background-color .2s, color .2s, border-color .2s;
+    user-select: none;
+}
+
+.tab-actividad.active {
+    background-color: var(--blanco);
+    color: var(--verde-principal);
+    border-bottom-color: var(--verde-principal);
+}
+
+.panel-actividad {
+    display: none;
+}
+
+.panel-actividad.active {
+    display: block;
+}
+
+.lista-actividad {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.card-actividad {
+    background-color: var(--blanco);
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+.card-actividad img {
+    width: 55px;
+    height: 55px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.card-actividad-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.card-actividad-info h4 {
+    font-size: calc(14px * var(--font-scale));
+    color: var(--texto-oscuro);
+    margin-bottom: 4px;
+}
+
+.card-actividad-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+}
+
+.card-actividad-meta span {
+    font-size: calc(12px * var(--font-scale));
+    color: var(--texto-mutado);
+    white-space: nowrap;
+}
+
+.btn-quitar-favorito {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #ffcc00;
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.estado-vacio-actividad {
+    text-align: center;
+    color: var(--blanco);
+    font-size: calc(14px * var(--font-scale));
+    padding: 50px 10px;
+}
+
+.estado-vacio-actividad span {
+    display: block;
+    font-size: 40px;
+    margin-bottom: 10px;
 }

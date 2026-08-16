@@ -156,6 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="submit">Registrarse</button>
         </form>
         <p>¿Ya tienes una cuenta? <a href="login.php">Inicia sesión aquí</a></p>
+        <p><a href="invitado.php">Entrar como invitado</a></p>
     </div>
     <script src="script.js"></script>
 </body>

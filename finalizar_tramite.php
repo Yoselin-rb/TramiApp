@@ -63,24 +63,52 @@ if ($metodo === 'POST') {
         exit();
     }
 
+    // Puntaje del intento, en porcentaje (0-100). Lo usamos en vez de
+    // "correctas" a secas para poder comparar intentos aunque el test
+    // tenga otra cantidad de preguntas en el futuro.
+    $puntaje = (int) round(($correctas / $total) * 100);
+
     try {
-        // INSERT IGNORE porque el usuario puede repetir el test luego de haberlo
-        // aprobado antes; no queremos duplicar el registro (unique key usuario+tramite)
+        // Guardamos CADA intento aprobado como una fila nueva (ya no solo la
+        // primera vez): así queda un historial completo por usuario+trámite,
+        // que es lo que necesita "Mi actividad" para mostrar cuántas veces
+        // lo hizo, cuándo fue la última vez y cuál fue su mejor puntaje.
         $stmt = $conexion->prepare(
-            "INSERT IGNORE INTO finalizados (usuario_id, tramite_id) VALUES (:usuario_id, :tramite_id)"
+            "INSERT INTO finalizados (usuario_id, tramite_id, correctas, total, puntaje)
+             VALUES (:usuario_id, :tramite_id, :correctas, :total, :puntaje)"
         );
         $stmt->bindParam(':usuario_id', $usuario_id);
         $stmt->bindParam(':tramite_id', $tramite_id);
+        $stmt->bindParam(':correctas', $correctas, PDO::PARAM_INT);
+        $stmt->bindParam(':total', $total, PDO::PARAM_INT);
+        $stmt->bindParam(':puntaje', $puntaje, PDO::PARAM_INT);
         $stmt->execute();
 
-        // Contamos el total de trámites finalizados del usuario para actualizar
-        // el contador de inicio.php si hace falta
-        $stmt = $conexion->prepare("SELECT COUNT(*) FROM finalizados WHERE usuario_id = :usuario_id");
+        // Contamos los trámites DISTINTOS finalizados del usuario (no la
+        // cantidad de intentos) para el contador de inicio.php
+        $stmt = $conexion->prepare("SELECT COUNT(DISTINCT tramite_id) FROM finalizados WHERE usuario_id = :usuario_id");
         $stmt->bindParam(':usuario_id', $usuario_id);
         $stmt->execute();
         $total_finalizados = $stmt->fetchColumn();
 
-        echo json_encode(['finalizado' => true, 'aprobo' => true, 'total' => (int) $total_finalizados]);
+        // Veces que hizo ESTE trámite y su mejor puntaje hasta ahora, por si
+        // se quiere mostrar feedback inmediato en la pantalla del test
+        $stmt = $conexion->prepare(
+            "SELECT COUNT(*) AS veces, MAX(puntaje) AS mejor_puntaje
+             FROM finalizados WHERE usuario_id = :usuario_id AND tramite_id = :tramite_id"
+        );
+        $stmt->bindParam(':usuario_id', $usuario_id);
+        $stmt->bindParam(':tramite_id', $tramite_id);
+        $stmt->execute();
+        $resumen = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        echo json_encode([
+            'finalizado' => true,
+            'aprobo' => true,
+            'total' => (int) $total_finalizados,
+            'veces_este_tramite' => (int) $resumen['veces'],
+            'mejor_puntaje' => (int) $resumen['mejor_puntaje'],
+        ]);
     } catch (PDOException $e) {
         http_response_code(500);
         echo json_encode(['error' => 'error_servidor']);
