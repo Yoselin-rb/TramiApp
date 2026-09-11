@@ -194,6 +194,18 @@ body {
     color: #1a4225;
 }
 
+.acciones-titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-editar-tramites {
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 1;
+    margin-right: 10px;
+}
 .btn-ver-mas {
     color: #1a4225;
     text-decoration: none;
@@ -237,9 +249,17 @@ body {
     border-radius: 8px;
 }
 
+
 .card-tramite span {
     font-size: 13px;
     font-weight: 500;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 /*tips y consejos*/

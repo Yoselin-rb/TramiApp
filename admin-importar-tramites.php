@@ -81,9 +81,9 @@ while (($fila = fgetcsv($manejador)) !== false) {
 
     // Validamos cada fila individualmente: si una fila viene mal, la
     // saltamos y seguimos con las demás en vez de cortar toda la importación
-    if ($id === '' || $nombre === '' || !preg_match('/^[a-z0-9\-]+$/', $id)) {
-        $omitidos++;
-        continue;
+    if ($id === '' || $nombre === '' || mb_strlen($nombre) > 50 || !preg_match('/^[a-z0-9\-]+$/', $id)) {
+    $omitidos++;
+    continue;
     }
 
     if (!in_array($modalidad, $modalidadesValidas, true)) {

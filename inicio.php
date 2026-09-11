@@ -3,10 +3,14 @@
 session_start();
 
 require_once 'conexion.php';
+require_once 'auto_login.php';   // <-- nuevo: restaura la sesión (y el rol) si venía por cookie "recordar usuario"
 
 // Obtenemos el nombre desde la sesión. Si no existe, podemos mostrar un texto por defecto como "Invitado".
 $esInvitado = !isset($_SESSION['usuario_id']);
 $nombreUsuario = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : 'Invitado';
+
+// Si el usuario logueado es editor de contenido, le mostramos el acceso rápido al panel
+$esEditor = isset($_SESSION['rol']) && $_SESSION['rol'] === 'editor';
 
 // Finalizados: cantidad de trámites DISTINTOS que el usuario completó
 // aprobando el test (si repitió un test varias veces, cuenta una sola vez)
@@ -69,7 +73,12 @@ if (isset($_SESSION['usuario_id'])) {
 
         <div class="section-title-container">
             <h3 class="section-title">Trámites frecuentes</h3>
-            <a href="tramites-guichon.php" class="btn-ver-mas">Ver más</a>
+            <div class="acciones-titulo">
+                <?php if ($esEditor): ?>
+                    <a href="admin-tramites.php" class="btn-editar-tramites" title="Administrar trámites">✏️</a>
+                <?php endif; ?>
+                <a href="tramites-guichon.php" class="btn-ver-mas">Ver más</a>
+            </div>
         </div>
 
         <div class="grid-tramites">

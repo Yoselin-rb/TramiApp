@@ -1,3 +1,11 @@
+/* pantallaa de bienvenida */
+if(window.location.pathname.includes("index.html")){
+    setTimeout(() => {
+        window.location.href = ("registro.php");
+    }, 3000);
+}
+
+
 /* ---------- Tamaño de letra (aplica en toda la app) ---------- */
 
 function getCookie(nombre) {
@@ -83,13 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-/* pantallaa de bienvenida */
-if(window.location.pathname.includes("index.html")){
-    setTimeout(() => {
-        window.location.href = ("registro.php");
-    }, 3000);
-}
 
 
 

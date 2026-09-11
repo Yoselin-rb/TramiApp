@@ -4,7 +4,7 @@
 $host = "localhost";
 $db_name = "tramiapp";
 $username = "root"; // Usuario por defecto en XAMPP/WampServer
-$password_bd = "";  // Contraseña por defecto (vacía en XAMPP)
+$password_bd = "";  // Contraseña por defecto (vacía en XAMPP) (en profreehost cambió a Trami2026)
 
 try {
     // Creamos la conexión usando PDO

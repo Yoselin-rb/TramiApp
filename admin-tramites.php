@@ -28,6 +28,7 @@ if (isset($_GET['guardado']) && $_GET['guardado'] === '1') {
     $errores = [
         'faltan_datos'     => 'Completá al menos el ID y el nombre del trámite.',
         'id_invalido'      => 'El ID solo puede tener minúsculas, números y guiones (ej: "ute-factura").',
+        'nombre_muy_largo' => 'El nombre no puede tener más de 50 caracteres.',
         'imagen_invalida'  => 'La imagen debe ser JPG, PNG o WEBP.',
         'error_servidor'   => 'Ocurrió un error al guardar. Intentá nuevamente.',
         'archivo_invalido' => 'Subí un archivo .csv válido.',
@@ -35,11 +36,46 @@ if (isset($_GET['guardado']) && $_GET['guardado'] === '1') {
     ];
     $texto = $errores[$_GET['error']] ?? 'Ocurrió un error.';
     $mensaje = "<div class='mensaje error'>$texto</div>";
+} elseif (isset($_GET['estado_cambiado'])) {
+    $mensaje = "<div class='mensaje exito'>Se actualizó el estado del trámite.</div>";
+} elseif (isset($_GET['eliminado'])) {
+    $mensaje = "<div class='mensaje exito'>Trámite eliminado correctamente.</div>";
 }
 
 // Traemos los trámites ya cargados para mostrarlos en una lista debajo del formulario
 $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC")->fetchAll(PDO::FETCH_ASSOC);
+
+// Si venimos de hacer click en "Editar", precargamos el formulario con
+// los datos existentes de ese trámite (incluye el contenido por modalidad)
+$edicion = null;
+$contenidoEdicion = [];
+
+if (isset($_GET['editar'])) {
+    $idEditar = trim($_GET['editar']);
+
+    $stmt = $conexion->prepare("SELECT * FROM tramites WHERE id = :id");
+    $stmt->bindParam(':id', $idEditar);
+    $stmt->execute();
+    $edicion = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($edicion) {
+        $stmt = $conexion->prepare("SELECT * FROM tramite_contenido WHERE tramite_id = :id");
+        $stmt->bindParam(':id', $idEditar);
+        $stmt->execute();
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $fila) {
+            $contenidoEdicion[$fila['modalidad']] = $fila;
+        }
+    }
+}
+
+// Función chica para no repetir el patrón "valor guardado o vacío" en el formulario
+function valorForm($valor): string
+{
+    return htmlspecialchars($valor ?? '');
+}
+
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -71,6 +107,10 @@ $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC"
             font-size: 14px;
             color: var(--texto-mutado);
         }
+        .contador-limite {
+            color: #b71c1c !important;
+            font-weight: bold;
+        }
         .campo-admin input[type="text"],
         .campo-admin textarea,
         .campo-admin select,
@@ -101,24 +141,37 @@ $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC"
         .btn-admin-guardar:hover {
             background-color: var(--verde-oscuro);
         }
+        .celda-nombre {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
         .tabla-tramites {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
-        .tabla-tramites th,
-        .tabla-tramites td {
+        .tabla-tramites th, .tabla-tramites td {
             text-align: left;
-            padding: 10px 8px;
+            padding: 14px 8px; /* antes 10px 8px — un poco más de aire */
             font-size: 13px;
             border-bottom: 1px solid #eee;
+            vertical-align: middle;
         }
+
+        .tabla-tramites td:nth-child(1) {
+            overflow: hidden; /* evita que la imagen se desborde a la fila de abajo */
+        }
+
         .tabla-tramites img {
             width: 36px;
             height: 36px;
             object-fit: cover;
             border-radius: 6px;
             vertical-align: middle;
+            display: block;
         }
+        
         .badge-inactivo {
             background: #fdecea;
             color: #b71c1c;
@@ -142,6 +195,22 @@ $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC"
         .bloque-modalidad.oculto {
             display: none;
         }
+        .celda-acciones {
+            white-space: nowrap;
+        }
+        .btn-accion {
+            display: inline-block;
+            border: none;
+            background: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+        .btn-accion:hover {
+            background: var(--fondo-gris);
+        }
     </style>
 </head>
 <body>
@@ -156,40 +225,55 @@ $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC"
 
         <?php echo $mensaje; ?>
 
-        <div class="panel-admin-card">
-            <h3>Cargar nuevo trámite</h3>
-            <p style="font-size:13px; color:var(--texto-mutado); margin-bottom:15px;">
-                Si usás un ID que ya existe, se actualizan los datos de ese trámite en vez de crear uno duplicado.
-            </p>
+        <div class="panel-admin-card" id="form-tramite">
+            <h3><?php echo $edicion ? 'Editar trámite: ' . htmlspecialchars($edicion['nombre']) : 'Cargar nuevo trámite'; ?></h3>
+
+            <?php if ($edicion): ?>
+                <p style="font-size:13px; color:var(--texto-mutado); margin-bottom:15px;">
+                    Estás editando un trámite existente. <a href="admin-tramites.php">Cancelar edición</a>
+                </p>
+            <?php else: ?>
+                <p style="font-size:13px; color:var(--texto-mutado); margin-bottom:15px;">
+                    Si usás un ID que ya existe, se actualizan los datos de ese trámite en vez de crear uno duplicado.
+                </p>
+            <?php endif; ?>
 
             <form action="admin-guardar-tramite.php" method="POST" enctype="multipart/form-data">
                 <div class="campo-admin">
                     <label for="id">ID único (sin espacios ni tildes, ej: "cedula-renovacion")</label>
                     <input type="text" id="id" name="id" placeholder="cedula-renovacion" required
-                           pattern="[a-z0-9\-]+" title="Solo minúsculas, números y guiones">
+                        pattern="[a-z0-9\-]+" title="Solo minúsculas, números y guiones"
+                        value="<?php echo valorForm($edicion['id'] ?? ''); ?>"
+                        <?php echo $edicion ? 'readonly style="background:#eee;"' : ''; ?>>
                 </div>
 
                 <div class="campo-admin">
-                    <label for="nombre">Nombre visible</label>
-                    <input type="text" id="nombre" name="nombre" placeholder="Renovación de Cédula" required>
+                    <label for="nombre">Nombre visible (máx. 50 caracteres)</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Renovación de Cédula" required
+                        maxlength="50" oninput="actualizarContadorNombre()"
+                        value="<?php echo valorForm($edicion['nombre'] ?? ''); ?>">
+                    <div id="contador-nombre" style="font-size:12px; color:var(--texto-mutado); margin-top:4px; text-align:right;">
+                        <?php echo mb_strlen($edicion['nombre'] ?? ''); ?>/50
+                    </div>
                 </div>
 
                 <div class="campo-admin">
                     <label for="descripcion">Descripción</label>
-                    <textarea id="descripcion" name="descripcion" placeholder="Explicación breve del trámite..."></textarea>
+                    <textarea id="descripcion" name="descripcion" placeholder="Explicación breve del trámite..."><?php echo valorForm($edicion['descripcion'] ?? ''); ?></textarea>
                 </div>
 
                 <div class="campo-admin">
                     <label for="modalidad">Modalidad</label>
+                    <?php $modalidadActual = $edicion['modalidad'] ?? 'ambas'; ?>
                     <select id="modalidad" name="modalidad">
-                        <option value="online">Online</option>
-                        <option value="presencial">Presencial</option>
-                        <option value="ambas" selected>Ambas</option>
+                        <option value="online" <?php echo $modalidadActual === 'online' ? 'selected' : ''; ?>>Online</option>
+                        <option value="presencial" <?php echo $modalidadActual === 'presencial' ? 'selected' : ''; ?>>Presencial</option>
+                        <option value="ambas" <?php echo $modalidadActual === 'ambas' ? 'selected' : ''; ?>>Ambas</option>
                     </select>
                 </div>
 
                 <div class="campo-admin">
-                    <label for="icono">Imagen (JPG, PNG o WEBP)</label>
+                    <label for="icono">Imagen (JPG, PNG o WEBP)<?php echo $edicion ? ' — dejá vacío para no cambiar la actual' : ''; ?></label>
                     <input type="file" id="icono" name="icono" accept="image/png, image/jpeg, image/webp">
                 </div>
 
@@ -207,21 +291,21 @@ $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC"
                     <div class="campo-admin">
                         <label for="descripcion_presencial">Texto de la franja superior (para esta modalidad)</label>
                         <textarea id="descripcion_presencial" name="descripcion_presencial"
-                                  placeholder="Ej: El trámite se realiza de forma presencial en..."></textarea>
+                                  placeholder="Ej: El trámite se realiza de forma presencial en..."><?php echo valorForm($contenidoEdicion['presencial']['descripcion'] ?? ''); ?></textarea>
                     </div>
                     <div class="campo-admin">
                         <label for="requisitos_presencial">Requisitos (uno por línea)</label>
                         <textarea id="requisitos_presencial" name="requisitos_presencial"
-                                  placeholder="Cédula de identidad&#10;Comprobante de domicilio"></textarea>
+                                  placeholder="Cédula de identidad&#10;Comprobante de domicilio"><?php echo valorForm($contenidoEdicion['presencial']['requisitos'] ?? ''); ?></textarea>
                     </div>
                     <div class="campo-admin">
                         <label for="donde_presencial">¿Dónde se realiza? (direcciones, horarios)</label>
                         <textarea id="donde_presencial" name="donde_presencial"
-                                  placeholder="Abitab Guichón - 18 de Julio 308&#10;Lunes a viernes de 8:15 a 18:30 hs"></textarea>
+                                  placeholder="Abitab Guichón - 18 de Julio 308&#10;Lunes a viernes de 8:15 a 18:30 hs"><?php echo valorForm($contenidoEdicion['presencial']['donde'] ?? ''); ?></textarea>
                     </div>
                     <div class="campo-admin">
                         <label for="video_presencial">Link a video explicativo (opcional)</label>
-                        <input type="text" id="video_presencial" name="video_presencial" placeholder="https://youtube.com/...">
+                        <input type="text" id="video_presencial" name="video_presencial" placeholder="https://youtube.com/..." value="<?php echo valorForm($contenidoEdicion['presencial']['video'] ?? ''); ?>">
                     </div>
                 </div>
 
@@ -231,21 +315,21 @@ $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC"
                     <div class="campo-admin">
                         <label for="descripcion_online">Texto de la franja superior (para esta modalidad)</label>
                         <textarea id="descripcion_online" name="descripcion_online"
-                                  placeholder="Ej: Podés hacer este trámite las 24 horas desde..."></textarea>
+                                  placeholder="Ej: Podés hacer este trámite las 24 horas desde..."><?php echo valorForm($contenidoEdicion['online']['descripcion'] ?? ''); ?></textarea>
                     </div>
                     <div class="campo-admin">
                         <label for="requisitos_online">Requisitos (uno por línea)</label>
                         <textarea id="requisitos_online" name="requisitos_online"
-                                  placeholder="Correo electrónico&#10;Medio de pago habilitado"></textarea>
+                                  placeholder="Correo electrónico&#10;Medio de pago habilitado"><?php echo valorForm($contenidoEdicion['online']['requisitos'] ?? ''); ?></textarea>
                     </div>
                     <div class="campo-admin">
                         <label for="donde_online">¿Dónde se realiza? (web, app, disponibilidad)</label>
                         <textarea id="donde_online" name="donde_online"
-                                  placeholder="A través de la web o app oficial&#10;Disponible las 24 horas"></textarea>
+                                  placeholder="A través de la web o app oficial&#10;Disponible las 24 horas"><?php echo valorForm($contenidoEdicion['online']['donde'] ?? ''); ?></textarea>
                     </div>
                     <div class="campo-admin">
                         <label for="video_online">Link a video explicativo (opcional)</label>
-                        <input type="text" id="video_online" name="video_online" placeholder="https://youtube.com/...">
+                        <input type="text" id="video_online" name="video_online" placeholder="https://youtube.com/..." value="<?php echo valorForm($contenidoEdicion['online']['video'] ?? ''); ?>">
                     </div>
                 </div>
 
@@ -274,13 +358,22 @@ $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC"
             </form>
         </div>
 
-        <div class="panel-admin-card">
+       <div class="panel-admin-card">
             <h3>Trámites cargados (<?php echo count($tramites); ?>)</h3>
 
             <?php if (empty($tramites)): ?>
                 <p style="color:var(--texto-mutado); font-size:14px;">Todavía no hay trámites cargados.</p>
             <?php else: ?>
-                <table class="tabla-tramites">
+
+                <input type="text" id="buscador-admin-tramites" class="search-bar"
+                    placeholder="Buscar por nombre o ID..." onkeyup="filtrarTablaAdmin()"
+                    style="margin-bottom:15px;">
+
+                <p id="sin-resultados-admin" class="oculto" style="color:var(--texto-mutado); font-size:14px; margin-bottom:10px;">
+                    No se encontraron trámites que coincidan con la búsqueda.
+                </p>
+
+                <table class="tabla-tramites" id="tabla-admin-tramites">
                     <thead>
                         <tr>
                             <th></th>
@@ -288,17 +381,22 @@ $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC"
                             <th>ID</th>
                             <th>Modalidad</th>
                             <th>Estado</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($tramites as $t): ?>
-                            <tr>
+                            <tr class="fila-tramite-admin"
+                                data-nombre="<?php echo htmlspecialchars(mb_strtolower($t['nombre'])); ?>"
+                                data-id="<?php echo htmlspecialchars(mb_strtolower($t['id'])); ?>">
                                 <td>
                                     <?php if (!empty($t['icono'])): ?>
                                         <img src="<?php echo htmlspecialchars($t['icono']); ?>" alt="">
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo htmlspecialchars($t['nombre']); ?></td>
+                                <td class="celda-nombre" title="<?php echo htmlspecialchars($t['nombre']); ?>">
+                                    <?php echo htmlspecialchars($t['nombre']); ?>
+                                </td>
                                 <td><code><?php echo htmlspecialchars($t['id']); ?></code></td>
                                 <td><?php echo htmlspecialchars($t['modalidad']); ?></td>
                                 <td>
@@ -307,6 +405,23 @@ $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC"
                                     <?php else: ?>
                                         <span class="badge-inactivo">Inactivo</span>
                                     <?php endif; ?>
+                                </td>
+                                <td class="celda-acciones">
+                                    <a href="admin-tramites.php?editar=<?php echo urlencode($t['id']); ?>#form-tramite"
+                                    class="btn-accion btn-editar" title="Editar">✏️</a>
+
+                                    <form action="admin-cambiar-estado.php" method="POST" style="display:inline;">
+                                        <input type="hidden" name="id" value="<?php echo htmlspecialchars($t['id']); ?>">
+                                        <button type="submit" class="btn-accion btn-toggle" title="<?php echo $t['activo'] ? 'Desactivar' : 'Activar'; ?>">
+                                            <?php echo $t['activo'] ? '🙈' : '👁️'; ?>
+                                        </button>
+                                    </form>
+
+                                    <form action="admin-eliminar-tramite.php" method="POST" style="display:inline;"
+                                        onsubmit="return confirm('¿Seguro que querés borrar «<?php echo htmlspecialchars($t['nombre'], ENT_QUOTES); ?>»? Esta acción no se puede deshacer.');">
+                                        <input type="hidden" name="id" value="<?php echo htmlspecialchars($t['id']); ?>">
+                                        <button type="submit" class="btn-accion btn-borrar" title="Borrar">🗑️</button>
+                                    </form>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -337,12 +452,58 @@ $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC"
             bloqueOnline.classList.toggle('oculto', modalidad === 'presencial');
         }
 
+        function filtrarTablaAdmin() {
+            const input = document.getElementById('buscador-admin-tramites');
+            if (!input) return;
+
+            const filtro = input.value.trim().toLowerCase();
+            const filas = document.querySelectorAll('#tabla-admin-tramites .fila-tramite-admin');
+            let visibles = 0;
+
+            filas.forEach(fila => {
+                const nombre = fila.dataset.nombre || '';
+                const id = fila.dataset.id || '';
+                const coincide = nombre.includes(filtro) || id.includes(filtro);
+
+                fila.style.display = coincide ? '' : 'none';
+                if (coincide) visibles++;
+            });
+
+            // Mensaje de "sin resultados" solo si hay texto buscado y nada coincidió
+            const avisoSinResultados = document.getElementById('sin-resultados-admin');
+            if (avisoSinResultados) {
+                avisoSinResultados.classList.toggle('oculto', !(filtro !== '' && visibles === 0));
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const select = document.getElementById('modalidad');
             if (!select) return;
             actualizarBloquesModalidad();
             select.addEventListener('change', actualizarBloquesModalidad);
         });
+
+        function actualizarContadorNombre() {
+            const input = document.getElementById('nombre');
+            const contador = document.getElementById('contador-nombre');
+            if (!input || !contador) return;
+
+            const max = input.maxLength;
+            const actual = input.value.length;
+
+            contador.textContent = `${actual}/${max}`;
+
+            // Avisamos visualmente cuando quedan pocos caracteres disponibles
+            if (actual >= max - 10) {
+                contador.classList.add('contador-limite');
+            } else {
+                contador.classList.remove('contador-limite');
+            }
+        }
+
+        // Por si la página se carga con el campo ya completado (ej: al volver atrás
+        // con el navegador y el campo quedó con texto), inicializamos el contador
+        document.addEventListener('DOMContentLoaded', actualizarContadorNombre);
     </script>
 </body>
 </html>

@@ -31,6 +31,11 @@ if ($id === '' || $nombre === '') {
     header("Location: admin-tramites.php?error=faltan_datos");
     exit();
 }
+// Nuevo: el nombre no puede ser eterno, rompe la tabla y las tarjetas
+if (mb_strlen($nombre) > 50) {
+    header("Location: admin-tramites.php?error=nombre_muy_largo");
+    exit();
+}
 
 // El ID solo puede tener minúsculas, números y guiones (ej: "ute-factura").
 // Esto es importante porque el mismo ID se usa como clave en favoritos y
