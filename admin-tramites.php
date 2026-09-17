@@ -332,6 +332,18 @@ function valorForm($valor): string
                         <input type="text" id="video_online" name="video_online" placeholder="https://youtube.com/..." value="<?php echo valorForm($contenidoEdicion['online']['video'] ?? ''); ?>">
                     </div>
                 </div>
+                <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
+
+                <p style="font-size:13px; color:var(--texto-mutado); margin-bottom:15px;">
+                    Preguntas del test de este trámite. Necesitás al menos 4 para que el test funcione
+                    (con la misma exigencia de 75% que usa la app: aprobar requiere 3 de 4 correctas).
+                </p>
+
+                <div id="lista-preguntas"></div>
+
+                <button type="button" class="btn-admin-guardar" style="background-color: var(--texto-oscuro); margin-bottom: 20px;" onclick="agregarPregunta()">
+                    + Agregar pregunta
+                </button>
 
                 <button type="submit" class="btn-admin-guardar">Guardar trámite</button>
             </form>
@@ -451,6 +463,67 @@ function valorForm($valor): string
             bloquePresencial.classList.toggle('oculto', modalidad === 'online');
             bloqueOnline.classList.toggle('oculto', modalidad === 'presencial');
         }
+        
+        let contadorPreguntas = 0;
+
+        function agregarPregunta() {
+            const indice = contadorPreguntas++;
+            const contenedor = document.getElementById('lista-preguntas');
+
+            const bloque = document.createElement('div');
+            bloque.className = 'bloque-modalidad';
+            bloque.id = `pregunta-${indice}`;
+            bloque.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h4 style="color:var(--verde-oscuro);">Pregunta</h4>
+                    <button type="button" onclick="document.getElementById('pregunta-${indice}').remove()"
+                            style="background:none; border:none; color:#b71c1c; cursor:pointer; font-size:13px;">
+                        ✕ Quitar
+                    </button>
+                </div>
+                <div class="campo-admin">
+                    <label>Texto de la pregunta</label>
+                    <textarea name="pregunta_texto[]" required></textarea>
+                </div>
+                <div class="campo-admin">
+                    <label>Opción A</label>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="radio" name="correcta_${indice}" value="0" required>
+                        <input type="text" name="opcion_a[]" style="flex:1;" required>
+                    </div>
+                </div>
+                <div class="campo-admin">
+                    <label>Opción B</label>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="radio" name="correcta_${indice}" value="1">
+                        <input type="text" name="opcion_b[]" style="flex:1;" required>
+                    </div>
+                </div>
+                <div class="campo-admin">
+                    <label>Opción C</label>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="radio" name="correcta_${indice}" value="2">
+                        <input type="text" name="opcion_c[]" style="flex:1;" required>
+                    </div>
+                </div>
+                <div class="campo-admin">
+                    <label>Opción D</label>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="radio" name="correcta_${indice}" value="3">
+                        <input type="text" name="opcion_d[]" style="flex:1;" required>
+                    </div>
+                </div>
+                <p style="font-size:12px; color:var(--texto-mutado);">Marcá con el círculo cuál opción es la correcta.</p>
+            `;
+            contenedor.appendChild(bloque);
+        }
+
+        // Arrancamos con 4 preguntas vacías, el mínimo que pide el test
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('lista-preguntas')) {
+                for (let i = 0; i < 4; i++) agregarPregunta();
+            }
+        });
 
         function filtrarTablaAdmin() {
             const input = document.getElementById('buscador-admin-tramites');

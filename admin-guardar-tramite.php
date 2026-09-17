@@ -126,12 +126,10 @@ try {
     // Guardamos el bloque "Presencial" si el trámite admite esa modalidad
     // (o "ambas") y si el editor completó algo; lo mismo para "Online".
     // Si el editor dejó todo el bloque vacío, no guardamos una fila vacía.
-    if ($modalidad === 'presencial' || $modalidad === 'ambas') {
-        guardarContenidoModalidad($conexion, $id, 'presencial', $_POST, 'presencial');
-    }
     if ($modalidad === 'online' || $modalidad === 'ambas') {
-        guardarContenidoModalidad($conexion, $id, 'online', $_POST, 'online');
-    }
+    guardarContenidoModalidad($conexion, $id, 'online', $_POST, 'online');
+}
+    guardarPreguntas($conexion, $id, $_POST); 
 
     header("Location: admin-tramites.php?guardado=1");
     exit();
@@ -176,4 +174,65 @@ function guardarContenidoModalidad(PDO $conexion, string $tramiteId, string $mod
     $stmt->bindParam(':donde_texto', $donde);
     $stmt->bindParam(':video_url', $video);
     $stmt->execute();
+}
+
+/**
+ * Reemplaza todas las preguntas del test de un trámite por las que vinieron
+ * del formulario. Borra las anteriores e inserta las nuevas (más simple que
+ * tratar de "actualizar" pregunta por pregunta, y evita preguntas viejas
+ * huérfanas si el editor borró o reordenó algunas).
+ */
+function guardarPreguntas(PDO $conexion, string $tramiteId, array $post): void
+{
+    $textos    = $post['pregunta_texto'] ?? [];
+    $opcionesA = $post['opcion_a'] ?? [];
+    $opcionesB = $post['opcion_b'] ?? [];
+    $opcionesC = $post['opcion_c'] ?? [];
+    $opcionesD = $post['opcion_d'] ?? [];
+
+    // Si no vino ninguna pregunta, no tocamos las que ya existían
+    // (por ejemplo, si alguien reenvía el form de edición sin el bloque de preguntas)
+    if (empty($textos)) {
+        return;
+    }
+
+    $stmtBorrar = $conexion->prepare("DELETE FROM tramite_preguntas WHERE tramite_id = :tramite_id");
+    $stmtBorrar->bindParam(':tramite_id', $tramiteId);
+    $stmtBorrar->execute();
+
+    $stmtInsertar = $conexion->prepare(
+        "INSERT INTO tramite_preguntas (tramite_id, texto, opcion_a, opcion_b, opcion_c, opcion_d, correcta, orden)
+         VALUES (:tramite_id, :texto, :opcion_a, :opcion_b, :opcion_c, :opcion_d, :correcta, :orden)"
+    );
+
+    $orden = 0;
+    foreach ($textos as $indice => $texto) {
+        $texto = trim($texto);
+        $a = trim($opcionesA[$indice] ?? '');
+        $b = trim($opcionesB[$indice] ?? '');
+        $c = trim($opcionesC[$indice] ?? '');
+        $d = trim($opcionesD[$indice] ?? '');
+
+        // Radio de "correcta" para ESTA pregunta puntual: viene como
+        // correcta_0, correcta_1, etc. (uno por bloque, ver admin-tramites.php)
+        $correcta = isset($post["correcta_$indice"]) ? (int) $post["correcta_$indice"] : null;
+
+        // Si a la pregunta le falta el texto, alguna opción, o no se marcó
+        // cuál es la correcta, la salteamos en vez de guardar algo incompleto
+        if ($texto === '' || $a === '' || $b === '' || $c === '' || $d === '' || $correcta === null || $correcta < 0 || $correcta > 3) {
+            continue;
+        }
+
+        $stmtInsertar->bindParam(':tramite_id', $tramiteId);
+        $stmtInsertar->bindParam(':texto', $texto);
+        $stmtInsertar->bindParam(':opcion_a', $a);
+        $stmtInsertar->bindParam(':opcion_b', $b);
+        $stmtInsertar->bindParam(':opcion_c', $c);
+        $stmtInsertar->bindParam(':opcion_d', $d);
+        $stmtInsertar->bindParam(':correcta', $correcta, PDO::PARAM_INT);
+        $stmtInsertar->bindParam(':orden', $orden, PDO::PARAM_INT);
+        $stmtInsertar->execute();
+
+        $orden++;
+    }
 }

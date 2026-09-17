@@ -207,10 +207,12 @@ function listaRequisitos(?string $texto): string
             </div>
         </div>
 
-        <a href="test.php?id=<?php echo urlencode($tramite['id']); ?>" class="btn-realizar-test">
-            Realizar test de este trámite
-        </a>
-
+        <div class="info-box" style="text-align:center; margin-top:20px;">
+            <h3>¿Ya hiciste el trámite?</h3>
+            <p style="font-size:13px; margin-bottom:15px;">Comprobá lo aprendido con un breve test y marcá este trámite como finalizado.</p>
+            <a href="test.php?id=<?php echo urlencode($tramite['id']); ?>" class="btn-comenzar-test" style="text-decoration:none;">Comenzar test ›</a>
+        </div>
+        
     </div>
 
     <nav class="bottom-nav">
