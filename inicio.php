@@ -86,7 +86,7 @@ if (isset($_SESSION['usuario_id'])) {
                 <img src="./img/Tramites/Cedula.jpg" alt="Cédula" style="width: 100px; height: 100px;">
                 <span>Renovación de Cédula</span>
             </a>
-            <a href="<?php echo $esInvitado ? 'registro.php' : 'ute-presencial.html'; ?>" class="card-tramite">
+            <a href="<?php echo $esInvitado ? 'registro.php' : 'tramite-detalle.php?id=ute-factura'; ?>" class="card-tramite">
                 <img src="./img/Tramites/factura-ute.webp" alt="UTE" style="width: 100px; height: 100px;">
                 <span>Pago de factura de UTE</span>
             </a>

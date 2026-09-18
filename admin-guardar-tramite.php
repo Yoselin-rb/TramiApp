@@ -126,10 +126,13 @@ try {
     // Guardamos el bloque "Presencial" si el trámite admite esa modalidad
     // (o "ambas") y si el editor completó algo; lo mismo para "Online".
     // Si el editor dejó todo el bloque vacío, no guardamos una fila vacía.
+    if ($modalidad === 'presencial' || $modalidad === 'ambas') {
+        guardarContenidoModalidad($conexion, $id, 'presencial', $_POST, 'presencial');
+    }
     if ($modalidad === 'online' || $modalidad === 'ambas') {
-    guardarContenidoModalidad($conexion, $id, 'online', $_POST, 'online');
-}
-    guardarPreguntas($conexion, $id, $_POST); 
+        guardarContenidoModalidad($conexion, $id, 'online', $_POST, 'online');
+    }
+guardarPreguntas($conexion, $id, $_POST);
 
     header("Location: admin-tramites.php?guardado=1");
     exit();

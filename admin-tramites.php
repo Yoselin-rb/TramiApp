@@ -49,6 +49,7 @@ $tramites = $conexion->query("SELECT * FROM tramites ORDER BY fecha_creado DESC"
 // los datos existentes de ese trámite (incluye el contenido por modalidad)
 $edicion = null;
 $contenidoEdicion = [];
+$preguntasEdicion = [];  
 
 if (isset($_GET['editar'])) {
     $idEditar = trim($_GET['editar']);
@@ -65,7 +66,14 @@ if (isset($_GET['editar'])) {
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $fila) {
             $contenidoEdicion[$fila['modalidad']] = $fila;
         }
+
+        // Nuevo: traemos también las preguntas del test de este trámite
+        $stmt = $conexion->prepare("SELECT * FROM tramite_preguntas WHERE tramite_id = :id ORDER BY orden ASC, id ASC");
+        $stmt->bindParam(':id', $idEditar);
+        $stmt->execute();
+        $preguntasEdicion = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 }
 
 // Función chica para no repetir el patrón "valor guardado o vacío" en el formulario
@@ -300,12 +308,11 @@ function valorForm($valor): string
                     </div>
                     <div class="campo-admin">
                         <label for="donde_presencial">¿Dónde se realiza? (direcciones, horarios)</label>
-                        <textarea id="donde_presencial" name="donde_presencial"
-                                  placeholder="Abitab Guichón - 18 de Julio 308&#10;Lunes a viernes de 8:15 a 18:30 hs"><?php echo valorForm($contenidoEdicion['presencial']['donde'] ?? ''); ?></textarea>
+                        <textarea id="donde_presencial" name="donde_presencial" placeholder="..."><?php echo valorForm($contenidoEdicion['presencial']['donde_texto'] ?? ''); ?></textarea>
                     </div>
                     <div class="campo-admin">
                         <label for="video_presencial">Link a video explicativo (opcional)</label>
-                        <input type="text" id="video_presencial" name="video_presencial" placeholder="https://youtube.com/..." value="<?php echo valorForm($contenidoEdicion['presencial']['video'] ?? ''); ?>">
+                        <input type="text" id="video_presencial" name="video_presencial" placeholder="https://youtube.com/..." value="<?php echo valorForm($contenidoEdicion['presencial']['video_url'] ?? ''); ?>">
                     </div>
                 </div>
 
@@ -325,11 +332,11 @@ function valorForm($valor): string
                     <div class="campo-admin">
                         <label for="donde_online">¿Dónde se realiza? (web, app, disponibilidad)</label>
                         <textarea id="donde_online" name="donde_online"
-                                  placeholder="A través de la web o app oficial&#10;Disponible las 24 horas"><?php echo valorForm($contenidoEdicion['online']['donde'] ?? ''); ?></textarea>
+                                  placeholder="A través de la web o app oficial&#10;Disponible las 24 horas"><?php echo valorForm($contenidoEdicion['online']['donde_texto'] ?? ''); ?></textarea>
                     </div>
                     <div class="campo-admin">
                         <label for="video_online">Link a video explicativo (opcional)</label>
-                        <input type="text" id="video_online" name="video_online" placeholder="https://youtube.com/..." value="<?php echo valorForm($contenidoEdicion['online']['video'] ?? ''); ?>">
+                        <input type="text" id="video_online" name="video_online" placeholder="https://youtube.com/..." value="<?php echo valorForm($contenidoEdicion['online']['video_url'] ?? ''); ?>">
                     </div>
                 </div>
                 <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
@@ -340,6 +347,11 @@ function valorForm($valor): string
                 </p>
 
                 <div id="lista-preguntas"></div>
+
+                <script>
+                    // Preguntas ya guardadas de este trámite (vacío si es un trámite nuevo)
+                    const preguntasExistentes = <?php echo json_encode($preguntasEdicion, JSON_UNESCAPED_UNICODE); ?>;
+                </script>
 
                 <button type="button" class="btn-admin-guardar" style="background-color: var(--texto-oscuro); margin-bottom: 20px;" onclick="agregarPregunta()">
                     + Agregar pregunta
@@ -465,10 +477,22 @@ function valorForm($valor): string
         }
         
         let contadorPreguntas = 0;
+        function escaparHtml(texto) {
+            const div = document.createElement('div');
+            div.textContent = texto ?? '';
+            return div.innerHTML;
+        }
 
-        function agregarPregunta() {
+        function agregarPregunta(datos = null) {
             const indice = contadorPreguntas++;
             const contenedor = document.getElementById('lista-preguntas');
+
+            const texto = datos ? escaparHtml(datos.texto) : '';
+            const a = datos ? escaparHtml(datos.opcion_a) : '';
+            const b = datos ? escaparHtml(datos.opcion_b) : '';
+            const c = datos ? escaparHtml(datos.opcion_c) : '';
+            const d = datos ? escaparHtml(datos.opcion_d) : '';
+            const correcta = datos ? parseInt(datos.correcta, 10) : null;
 
             const bloque = document.createElement('div');
             bloque.className = 'bloque-modalidad';
@@ -483,34 +507,34 @@ function valorForm($valor): string
                 </div>
                 <div class="campo-admin">
                     <label>Texto de la pregunta</label>
-                    <textarea name="pregunta_texto[]" required></textarea>
+                    <textarea name="pregunta_texto[]" required>${texto}</textarea>
                 </div>
                 <div class="campo-admin">
                     <label>Opción A</label>
                     <div style="display:flex; gap:8px; align-items:center;">
-                        <input type="radio" name="correcta_${indice}" value="0" required>
-                        <input type="text" name="opcion_a[]" style="flex:1;" required>
+                        <input type="radio" name="correcta_${indice}" value="0" ${correcta === 0 ? 'checked' : ''} required>
+                        <input type="text" name="opcion_a[]" style="flex:1;" value="${a}" required>
                     </div>
                 </div>
                 <div class="campo-admin">
                     <label>Opción B</label>
                     <div style="display:flex; gap:8px; align-items:center;">
-                        <input type="radio" name="correcta_${indice}" value="1">
-                        <input type="text" name="opcion_b[]" style="flex:1;" required>
+                        <input type="radio" name="correcta_${indice}" value="1" ${correcta === 1 ? 'checked' : ''}>
+                        <input type="text" name="opcion_b[]" style="flex:1;" value="${b}" required>
                     </div>
                 </div>
                 <div class="campo-admin">
                     <label>Opción C</label>
                     <div style="display:flex; gap:8px; align-items:center;">
-                        <input type="radio" name="correcta_${indice}" value="2">
-                        <input type="text" name="opcion_c[]" style="flex:1;" required>
+                        <input type="radio" name="correcta_${indice}" value="2" ${correcta === 2 ? 'checked' : ''}>
+                        <input type="text" name="opcion_c[]" style="flex:1;" value="${c}" required>
                     </div>
                 </div>
                 <div class="campo-admin">
                     <label>Opción D</label>
                     <div style="display:flex; gap:8px; align-items:center;">
-                        <input type="radio" name="correcta_${indice}" value="3">
-                        <input type="text" name="opcion_d[]" style="flex:1;" required>
+                        <input type="radio" name="correcta_${indice}" value="3" ${correcta === 3 ? 'checked' : ''}>
+                        <input type="text" name="opcion_d[]" style="flex:1;" value="${d}" required>
                     </div>
                 </div>
                 <p style="font-size:12px; color:var(--texto-mutado);">Marcá con el círculo cuál opción es la correcta.</p>
@@ -518,13 +542,18 @@ function valorForm($valor): string
             contenedor.appendChild(bloque);
         }
 
-        // Arrancamos con 4 preguntas vacías, el mínimo que pide el test
         document.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById('lista-preguntas')) {
-                for (let i = 0; i < 4; i++) agregarPregunta();
+                if (typeof preguntasExistentes !== 'undefined' && preguntasExistentes.length > 0) {
+                    // Editando un trámite que ya tenía preguntas: las precargamos
+                    preguntasExistentes.forEach(p => agregarPregunta(p));
+                } else {
+                    // Trámite nuevo, o uno que todavía no tenía preguntas cargadas
+                    for (let i = 0; i < 4; i++) agregarPregunta();
+                }
             }
         });
-
+        
         function filtrarTablaAdmin() {
             const input = document.getElementById('buscador-admin-tramites');
             if (!input) return;

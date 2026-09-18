@@ -199,50 +199,7 @@ function alternarFavorito() {
 
 // Banco de preguntas por trámite. Para agregar el test de un nuevo trámite,
 // alcanza con sumar una entrada nueva acá con su tramite_id como clave.
-const MAPA_TESTS = {
-    'ute-factura': [
-        {
-            texto: '¿Qué documento principal necesitás para el trámite de factura de UTE?',
-            opciones: [
-                'N° de Cuenta de UTE (está en la factura)',
-                'Cédula de identidad',
-                'Partida de nacimiento',
-                'Comprobante de domicilio'
-            ],
-            correcta: 0
-        },
-        {
-            texto: '¿Dónde podés realizar el trámite de UTE?',
-            opciones: [
-                'Únicamente en las oficinas de UTE',
-                'Solo se puede hacer por teléfono',
-                'A través de la web/App de UTE o aplicaciones de pago habilitadas',
-                'No se puede pagar en Guichón'
-            ],
-            correcta: 2
-        },
-        {
-            texto: '¿Qué medio de pago podés utilizar para realizar el pago en línea?',
-            opciones: [
-                'Solo efectivo',
-                'Tarjeta de débito o crédito',
-                'Cheque',
-                'Giro postal'
-            ],
-            correcta: 1
-        },
-        {
-            texto: 'Pagaste la factura. ¿Qué es lo más recomendable hacer?',
-            opciones: [
-                'Borrar el comprobante enseguida',
-                'Llamar a UTE para avisar',
-                'Guardar el comprobante de pago',
-                'No hace falta guardar nada'
-            ],
-            correcta: 2
-        }
-    ]
-};
+const MAPA_TESTS = {};
 
 // Estado del test que se está rindiendo actualmente
 let testEstado = {
